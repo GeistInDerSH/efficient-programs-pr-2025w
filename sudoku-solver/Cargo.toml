@@ -1,0 +1,17 @@
+[package]
+name = "sudoku-solver"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+default = ["basic"]
+basic = []
+
+[dev-dependencies]
+criterion = "0.5.1"
+
+[dependencies]
+
+[[bench]]
+name = "benchmarks"
+harness = false
