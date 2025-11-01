@@ -6,6 +6,7 @@ edition = "2024"
 [features]
 default = ["basic"]
 basic = []
+grid_bit_masking = []
 
 [dev-dependencies]
 criterion = "0.5.1"
