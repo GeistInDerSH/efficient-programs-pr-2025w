@@ -143,3 +143,158 @@ macro_rules! time_it {
         (res, duration)
     }};
 }
+
+pub mod example_boards {
+    use super::*;
+
+    const fn board_from_2d(array: [[u8; 9]; 9]) -> Board {
+        let mut buff = [0; 81];
+        let mut row = 0;
+        while row < 9 {
+            let row_offset = row * 9;
+            let mut col = 0;
+            while col < 9 {
+                buff[row_offset + col] = array[row][col];
+                col += 1;
+            }
+            row += 1;
+        }
+        Board(buff)
+    }
+
+    pub const EASY_BOARD: Board = board_from_2d([
+        [0, 5, 0, 0, 0, 9, 8, 1, 3],
+        [9, 8, 0, 3, 5, 0, 6, 0, 7],
+        [6, 0, 0, 0, 8, 0, 5, 9, 4],
+        [8, 3, 2, 0, 0, 6, 0, 0, 0],
+        [7, 0, 0, 1, 2, 8, 0, 0, 9],
+        [1, 9, 0, 0, 7, 3, 2, 0, 0],
+        [3, 7, 0, 6, 9, 0, 0, 5, 0],
+        [0, 2, 0, 0, 0, 0, 7, 0, 0],
+        [0, 0, 0, 0, 0, 4, 0, 0, 0],
+    ]);
+    pub const MEDIUM_BOARD: Board = board_from_2d([
+        [8, 6, 0, 0, 1, 7, 0, 0, 0],
+        [0, 0, 0, 0, 0, 6, 0, 3, 0],
+        [5, 0, 2, 0, 9, 0, 1, 0, 0],
+        [6, 9, 0, 2, 0, 4, 3, 5, 1],
+        [4, 7, 5, 9, 0, 1, 8, 0, 6],
+        [0, 0, 0, 8, 0, 5, 0, 7, 0],
+        [7, 0, 6, 0, 0, 0, 0, 9, 3],
+        [0, 0, 0, 0, 0, 9, 6, 0, 2],
+        [0, 2, 0, 0, 5, 0, 0, 0, 0],
+    ]);
+    pub const HARD_BOARD: Board = board_from_2d([
+        [0, 9, 0, 0, 1, 0, 0, 7, 2],
+        [0, 0, 0, 6, 9, 0, 0, 3, 1],
+        [0, 0, 3, 0, 7, 0, 5, 0, 9],
+        [3, 8, 0, 4, 0, 0, 1, 0, 0],
+        [0, 0, 0, 0, 8, 1, 0, 9, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [7, 3, 0, 9, 2, 0, 0, 0, 0],
+        [6, 5, 0, 0, 0, 7, 0, 0, 8],
+        [0, 4, 0, 0, 0, 0, 7, 6, 0],
+    ]);
+    pub const EXTRA_HARD_BOARD: Board = board_from_2d([
+        [0, 0, 0, 0, 0, 6, 7, 0, 0],
+        [3, 9, 0, 7, 0, 0, 0, 1, 0],
+        [1, 0, 0, 0, 0, 0, 4, 0, 0],
+        [4, 0, 0, 0, 0, 0, 0, 6, 0],
+        [7, 0, 0, 0, 2, 0, 0, 0, 0],
+        [0, 0, 8, 5, 0, 0, 3, 0, 0],
+        [6, 0, 0, 9, 0, 0, 5, 0, 0],
+        [8, 3, 0, 0, 5, 0, 6, 4, 0],
+        [0, 4, 9, 6, 1, 3, 0, 2, 7],
+    ]);
+    pub const HARD_2X_BOARD: Board = board_from_2d([
+        [0, 7, 3, 0, 0, 2, 0, 0, 0],
+        [0, 0, 0, 0, 7, 0, 0, 0, 0],
+        [0, 0, 1, 0, 3, 0, 8, 0, 0],
+        [0, 0, 0, 2, 6, 0, 0, 8, 0],
+        [0, 0, 0, 5, 0, 0, 0, 2, 0],
+        [0, 0, 0, 0, 0, 0, 1, 3, 7],
+        [6, 0, 0, 4, 0, 9, 0, 0, 0],
+        [0, 2, 0, 0, 0, 0, 9, 0, 0],
+        [8, 0, 0, 0, 0, 0, 0, 0, 1],
+    ]);
+    pub const INVALID_BOARD: Board = board_from_2d([
+        [0, 5, 0, 0, 0, 9, 8, 1, 3],
+        [9, 8, 0, 3, 5, 0, 5, 0, 7],
+        [6, 0, 0, 0, 8, 6, 0, 9, 4],
+        [8, 3, 2, 0, 0, 6, 0, 0, 0],
+        [7, 0, 0, 1, 2, 8, 0, 0, 9],
+        [1, 9, 0, 0, 7, 3, 2, 0, 0],
+        [3, 7, 0, 6, 9, 0, 0, 5, 0],
+        [0, 2, 0, 0, 0, 0, 7, 0, 0],
+        [0, 0, 0, 0, 0, 4, 0, 0, 0],
+    ]);
+    pub const SOLVED_BOARD: Board = board_from_2d([
+        [1, 3, 9, 2, 4, 6, 7, 5, 8],
+        [5, 7, 2, 8, 1, 3, 4, 6, 9],
+        [4, 6, 8, 7, 9, 5, 1, 3, 2],
+        [2, 8, 7, 5, 6, 4, 3, 9, 1],
+        [9, 4, 1, 3, 7, 2, 6, 8, 5],
+        [6, 5, 3, 1, 8, 9, 2, 7, 4],
+        [7, 2, 6, 4, 5, 8, 9, 1, 3],
+        [3, 1, 5, 9, 2, 7, 8, 4, 6],
+        [8, 9, 4, 6, 3, 1, 5, 2, 7],
+    ]);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::SudokuSolver;
+
+    #[test]
+    fn test_is_valid() {
+        let board = example_boards::SOLVED_BOARD;
+        let solution = board.solve();
+        assert!(solution.is_some());
+        let solution = solution.unwrap();
+        let expected = example_boards::SOLVED_BOARD;
+        assert_eq!(solution, expected);
+    }
+
+    #[test]
+    fn solve_easy() {
+        let board = example_boards::EASY_BOARD;
+        let solution = board.solve();
+        assert!(solution.is_some());
+    }
+
+    #[test]
+    fn solve_medium() {
+        let board = example_boards::MEDIUM_BOARD;
+        let solution = board.solve();
+        assert!(solution.is_some());
+    }
+
+    #[test]
+    fn solve_hard() {
+        let board = example_boards::HARD_BOARD;
+        let solution = board.solve();
+        assert!(solution.is_some());
+    }
+
+    #[test]
+    fn solve_extra_hard() {
+        let board = example_boards::EXTRA_HARD_BOARD;
+        let solution = board.solve();
+        assert!(solution.is_some());
+    }
+
+    #[test]
+    fn solve_2x_hard() {
+        let board = example_boards::HARD_2X_BOARD;
+        let solution = board.solve();
+        assert!(solution.is_some());
+    }
+
+    #[test]
+    fn solve_invalid() {
+        let board = example_boards::INVALID_BOARD;
+        let solution = board.solve();
+        assert!(solution.is_none());
+    }
+}
