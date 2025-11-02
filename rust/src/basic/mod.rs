@@ -59,40 +59,45 @@ fn solve(grid: &mut [u8; 81], row: usize, col: usize) -> bool {
     }
 }
 
+/// Verify that we can solve the board by checking row/col/box collisions.
+/// '0' values in the grid are ignored.
+fn is_solvable_board(grid: [u8; 81]) -> bool {
+    let mut seen_box: HashSet<(usize, usize, u8)> = HashSet::with_capacity(81);
+    for row in 0..9 {
+        let mut seen_row = HashSet::with_capacity(9);
+        let mut seen_col = HashSet::with_capacity(9);
+
+        for col in 0..9 {
+            let row_value = grid[row * 9 + col];
+            if row_value != 0 && !seen_row.insert(row_value) {
+                return false;
+            }
+            let col_value = grid[col * 9 + row];
+            if col_value != 0 && !seen_col.insert(col_value) {
+                return false;
+            }
+
+            // Don't add 0 to seen box
+            if row_value == 0 {
+                continue;
+            }
+
+            let box_start_col = col.div(3) * 3;
+            let box_start_row = row.div(3) * 3;
+            let tuple = (box_start_row, box_start_col, row_value);
+            if !seen_box.insert(tuple) {
+                return false;
+            }
+        }
+    }
+    true
+}
+
 impl super::SudokuSolver for Board {
     fn solve(&self) -> Option<Solution> {
         let mut grid = self.0;
 
-        let mut seen_box: HashSet<(usize, usize, u8)> = HashSet::with_capacity(81);
-        for row in 0..9 {
-            let mut seen_row = HashSet::with_capacity(9);
-            let mut seen_col = HashSet::with_capacity(9);
-
-            for col in 0..9 {
-                let row_value = grid[row * 9 + col];
-                if row_value != 0 && !seen_row.insert(row_value) {
-                    return None;
-                }
-                let col_value = grid[col * 9 + row];
-                if col_value != 0 && !seen_col.insert(col_value) {
-                    return None;
-                }
-
-                // Don't add 0 to seen box
-                if row_value == 0 {
-                    continue;
-                }
-
-                let box_start_col = col.div(3) * 3;
-                let box_start_row = row.div(3) * 3;
-                let tuple = (box_start_row, box_start_col, row_value);
-                if !seen_box.insert(tuple) {
-                    return None;
-                }
-            }
-        }
-
-        if solve(&mut grid, 0, 0) {
+        if is_solvable_board(grid) && solve(&mut grid, 0, 0) {
             Some(grid.into())
         } else {
             None
