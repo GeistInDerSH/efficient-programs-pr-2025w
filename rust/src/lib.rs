@@ -217,7 +217,7 @@ pub mod example_boards {
         [0, 2, 0, 0, 0, 0, 9, 0, 0],
         [8, 0, 0, 0, 0, 0, 0, 0, 1],
     ]);
-    pub const INVALID_BOARD: Board = board_from_2d([
+    pub const INVALID_BOARD_ROW_AND_COL_COLLISION: Board = board_from_2d([
         [0, 5, 0, 0, 0, 9, 8, 1, 3],
         [9, 8, 0, 3, 5, 0, 5, 0, 7],
         [6, 0, 0, 0, 8, 6, 0, 9, 4],
@@ -227,6 +227,39 @@ pub mod example_boards {
         [3, 7, 0, 6, 9, 0, 0, 5, 0],
         [0, 2, 0, 0, 0, 0, 7, 0, 0],
         [0, 0, 0, 0, 0, 4, 0, 0, 0],
+    ]);
+    pub const INVALID_BOARD_ROW_COLLISION: Board = board_from_2d([
+        [0, 5, 0, 0, 0, 9, 8, 1, 3],
+        [9, 8, 0, 3, 5, 0, 5, 0, 7],
+        [6, 0, 0, 0, 8, 0, 6, 9, 4],
+        [8, 3, 2, 0, 0, 6, 0, 0, 0],
+        [7, 0, 0, 1, 2, 8, 0, 0, 9],
+        [1, 9, 0, 0, 7, 3, 2, 0, 0],
+        [3, 7, 0, 6, 9, 0, 0, 5, 0],
+        [0, 2, 0, 0, 0, 0, 7, 0, 0],
+        [0, 0, 0, 0, 0, 4, 0, 0, 0],
+    ]);
+    pub const INVALID_BOARD_COL_COLLISION: Board = board_from_2d([
+        [0, 5, 0, 0, 0, 9, 8, 1, 3],
+        [9, 8, 0, 3, 5, 6, 0, 0, 7],
+        [6, 0, 0, 0, 8, 0, 5, 9, 4],
+        [8, 3, 2, 0, 0, 6, 0, 0, 0],
+        [7, 0, 0, 1, 2, 8, 0, 0, 9],
+        [1, 9, 0, 0, 7, 3, 2, 0, 0],
+        [3, 7, 0, 6, 9, 0, 0, 5, 0],
+        [0, 2, 0, 0, 0, 0, 7, 0, 0],
+        [0, 0, 0, 0, 0, 4, 0, 0, 0],
+    ]);
+    pub const INVALID_BOARD_BOX_COLLISION: Board = board_from_2d([
+        [0, 5, 0, 0, 0, 9, 8, 1, 3],
+        [9, 8, 0, 3, 5, 0, 6, 0, 7],
+        [6, 0, 0, 0, 8, 0, 5, 9, 4],
+        [8, 3, 2, 0, 0, 6, 0, 0, 0],
+        [7, 0, 0, 1, 2, 8, 0, 0, 9],
+        [1, 9, 0, 0, 7, 3, 2, 0, 0],
+        [3, 7, 0, 6, 9, 0, 0, 5, 0],
+        [0, 2, 0, 0, 0, 0, 7, 0, 0],
+        [0, 0, 3, 0, 0, 4, 0, 0, 0],
     ]);
     pub const SOLVED_BOARD: Board = board_from_2d([
         [1, 3, 9, 2, 4, 6, 7, 5, 8],
@@ -292,8 +325,29 @@ mod tests {
     }
 
     #[test]
-    fn solve_invalid() {
-        let board = example_boards::INVALID_BOARD;
+    fn solve_invalid_row() {
+        let board = example_boards::INVALID_BOARD_ROW_COLLISION;
+        let solution = board.solve();
+        assert!(solution.is_none());
+    }
+
+    #[test]
+    fn solve_invalid_col() {
+        let board = example_boards::INVALID_BOARD_COL_COLLISION;
+        let solution = board.solve();
+        assert!(solution.is_none());
+    }
+
+    #[test]
+    fn solve_invalid_row_and_col() {
+        let board = example_boards::INVALID_BOARD_ROW_AND_COL_COLLISION;
+        let solution = board.solve();
+        assert!(solution.is_none());
+    }
+
+    #[test]
+    fn solve_invalid_box() {
+        let board = example_boards::INVALID_BOARD_BOX_COLLISION;
         let solution = board.solve();
         assert!(solution.is_none());
     }

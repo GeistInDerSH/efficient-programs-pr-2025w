@@ -67,6 +67,15 @@ impl super::SudokuSolver for Board {
                 let box_number = row.div(3) * 3 + col.div(3);
                 let value = grid[row_offset + col];
                 let mask = 1 << value;
+
+                if value != 0
+                    && (rows[row] & mask != 0
+                        || cols[col] & mask != 0
+                        || boxes[box_number] & mask != 0)
+                {
+                    return None;
+                }
+
                 rows[row] |= mask;
                 cols[col] |= mask;
                 boxes[box_number] |= mask;

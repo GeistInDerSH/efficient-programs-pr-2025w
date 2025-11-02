@@ -29,7 +29,7 @@ fn criterion_benchmark(c: &mut Criterion) {
         b.iter(|| sudoku_solver::example_boards::SOLVED_BOARD.solve());
     });
     c.bench_function("solve for valid board (invalid)", |b| {
-        b.iter(|| sudoku_solver::example_boards::INVALID_BOARD.solve());
+        b.iter(|| sudoku_solver::example_boards::INVALID_BOARD_ROW_AND_COL_COLLISION.solve());
     });
 }
 
