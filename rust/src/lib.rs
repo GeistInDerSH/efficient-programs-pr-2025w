@@ -1,4 +1,5 @@
 use std::fmt::{Debug, Display};
+use std::io;
 use std::io::Read;
 
 #[cfg(feature = "basic")]
@@ -96,7 +97,7 @@ impl Debug for Board {
 /// * The given file does not exist
 /// * The file is smaller than 89 bytes
 /// * Data in the file is not digits 0 to 9
-pub fn read_file(filename: &str) -> std::io::Result<Board> {
+pub fn read_file(filename: &str) -> io::Result<Board> {
     let mut file = std::fs::File::open(filename)?;
 
     // 9 rows of 10 chars, but the last may leave out the new-line
@@ -106,21 +107,25 @@ pub fn read_file(filename: &str) -> std::io::Result<Board> {
     // Copy bytes out of the string. Each line should be 10 bytes long, 9 digits and 1 new line.
     // Because of the new line, we need to add a small correction when addressing into the 1d array
     let mut buffer = [0; 81];
-    for i in 0..9 {
-        buffer[i * 9..i * 9 + 9].copy_from_slice(&data[i * 9 + i..i * 9 + 9 + i]);
-    }
-    // subtract ascii 0 to get digits in range 0..9
-    for i in &mut buffer {
-        if !(b'0' <= *i && *i <= b'9') {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::InvalidData,
-                "Invalid input",
-            ));
+    let mut index = 0;
+    for i in &data {
+        match *i {
+            b'0'..=b'9' => {
+                buffer[index] = *i - b'0';
+                index += 1;
+            }
+            b'\n' => {}
+            _ => {
+                return Err(io::Error::new(io::ErrorKind::InvalidData, "Invalid input"));
+            }
         }
-        *i -= b'0';
     }
 
-    Ok(buffer.into())
+    if index == 81 {
+        Ok(buffer.into())
+    } else {
+        Err(io::Error::new(io::ErrorKind::InvalidData, "Invalid input"))
+    }
 }
 
 /// This is a macro that evaluates an expression, i.e. the body, and returns the result
