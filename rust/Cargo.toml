@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [features]
-default = ["basic"]
-basic = []
-grid_bit_masking = []
-grid_bit_masking_bitset = []
+default = ["solve_basic"]
+solve_basic = []
+solve_grid_bit_masking = []
+solve_grid_bit_masking_bitset = []
 
 [dev-dependencies]
 criterion = "0.7.0"

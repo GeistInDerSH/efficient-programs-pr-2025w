@@ -2,11 +2,11 @@ use std::fmt::{Debug, Display};
 use std::io;
 use std::io::Read;
 
-#[cfg(feature = "basic")]
+#[cfg(feature = "solve_basic")]
 pub mod basic;
-#[cfg(feature = "grid_bit_masking")]
+#[cfg(feature = "solve_grid_bit_masking")]
 pub mod grid_bit_masking;
-#[cfg(feature = "grid_bit_masking_bitset")]
+#[cfg(feature = "solve_grid_bit_masking_bitset")]
 pub mod grid_bit_masking_bitset;
 
 /// The [`SudokuSolver`] trait is one that any solution attempt should implement on [`Board`] in
