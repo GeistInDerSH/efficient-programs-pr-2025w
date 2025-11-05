@@ -7,6 +7,7 @@ edition = "2024"
 default = ["solve_basic"]
 solve_basic = []
 solve_bit_masking_v1 = []
+solve_bit_masking_v2 = []
 solve_bitset_masking_v1 = []
 measure_runtime = []
 

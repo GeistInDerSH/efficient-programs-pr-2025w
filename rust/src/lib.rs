@@ -6,6 +6,8 @@ use std::io::Read;
 pub mod basic;
 #[cfg(feature = "solve_bit_masking_v1")]
 pub mod bit_masking_v1;
+#[cfg(feature = "solve_bit_masking_v2")]
+pub mod bit_masking_v2;
 #[cfg(feature = "solve_bitset_masking_v1")]
 pub mod bitset_masking_v1;
 
