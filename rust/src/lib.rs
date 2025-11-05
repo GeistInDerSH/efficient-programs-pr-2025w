@@ -4,10 +4,10 @@ use std::io::Read;
 
 #[cfg(feature = "solve_basic")]
 pub mod basic;
-#[cfg(feature = "solve_grid_bit_masking")]
-pub mod grid_bit_masking;
-#[cfg(feature = "solve_grid_bit_masking_bitset")]
-pub mod grid_bit_masking_bitset;
+#[cfg(feature = "solve_bit_masking_v1")]
+pub mod bit_masking_v1;
+#[cfg(feature = "solve_bitset_masking_v1")]
+pub mod bitset_masking_v1;
 
 /// The [`SudokuSolver`] trait is one that any solution attempt should implement on [`Board`] in
 /// a submodule. That submodule should then be conditionally imported if a feature flag is set.

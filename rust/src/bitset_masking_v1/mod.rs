@@ -2,7 +2,7 @@ use crate::{Board, Solution};
 use std::ops::Div;
 
 /// Attempt to pack the values seen in the rows/column/box into a
-/// bitset to reduce space over the version in grid_bit_masking
+/// bitset to reduce space over the version in bit_masking_v1
 struct BitSet {
     row_bits: u128,
     col_bits: u128,
