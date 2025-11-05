@@ -10,7 +10,7 @@ grid_bit_masking = []
 grid_bit_masking_bitset = []
 
 [dev-dependencies]
-criterion = "0.5.1"
+criterion = "0.7.0"
 
 [dependencies]
 
