@@ -8,6 +8,7 @@ default = ["solve_basic"]
 solve_basic = []
 solve_grid_bit_masking = []
 solve_grid_bit_masking_bitset = []
+measure_runtime = []
 
 [dev-dependencies]
 criterion = "0.7.0"
