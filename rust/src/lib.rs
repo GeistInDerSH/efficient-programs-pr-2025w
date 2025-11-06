@@ -104,7 +104,7 @@ pub fn read_file(filename: &str) -> io::Result<Board> {
 
     // 9 rows of 10 chars, but the last may leave out the new-line
     let mut data = [0; 89];
-    file.read_exact(&mut data)?;
+    let _ = file.read(&mut data)?;
 
     // Copy bytes out of the string. Each line should be 10 bytes long, 9 digits and 1 new line.
     // Because of the new line, we need to add a small correction when addressing into the 1d array
