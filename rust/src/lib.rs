@@ -174,7 +174,7 @@ macro_rules! time_it {
 }
 
 pub mod example_boards {
-    use super::*;
+    use super::Board;
 
     const fn board_from_2d(array: [[u8; 9]; 9]) -> Board {
         let mut buff = [0; 81];
@@ -379,5 +379,12 @@ mod tests {
         let board = example_boards::INVALID_BOARD_BOX_COLLISION;
         let solution = board.solve();
         assert!(solution.is_none());
+    }
+
+    #[test]
+    fn solved_board_to_string() {
+        let board = example_boards::SOLVED_BOARD.to_string();
+        let expected = "139246758\n572813469\n468795132\n287564391\n941372685\n653189274\n726458913\n315927846\n894631527\n";
+        assert_eq!(expected, board);
     }
 }
