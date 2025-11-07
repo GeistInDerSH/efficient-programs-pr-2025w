@@ -6,6 +6,7 @@ edition = "2024"
 [features]
 default = ["solve_basic"]
 solve_basic = []
+solve_basic_std_index = []
 solve_bit_masking_v1 = []
 solve_bit_masking_v2 = []
 solve_bitset_masking_v1 = []

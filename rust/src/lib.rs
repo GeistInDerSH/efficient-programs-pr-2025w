@@ -1,9 +1,12 @@
 use std::fmt::{Debug, Display};
 use std::io;
 use std::io::Read;
+use std::ops::{Index, IndexMut};
 
 #[cfg(feature = "solve_basic")]
 pub mod basic;
+#[cfg(feature = "solve_basic_std_index")]
+pub mod basic_std_index;
 #[cfg(feature = "solve_bit_masking_v1")]
 pub mod bit_masking_v1;
 #[cfg(feature = "solve_bit_masking_v2")]
@@ -84,6 +87,23 @@ impl Display for Board {
             writeln!(f)?;
         }
         Ok(())
+    }
+}
+
+/// Add support for (row, col) indexing to make it easier to work with the Board
+impl Index<(usize, usize)> for Board {
+    type Output = u8;
+
+    fn index(&self, index: (usize, usize)) -> &Self::Output {
+        &self.0[index.0 * 9 + index.1]
+    }
+}
+
+/// Add support for (row, col) indexing to make it easier to work with the Board, and
+/// mutating the value at the index.
+impl IndexMut<(usize, usize)> for Board {
+    fn index_mut(&mut self, index: (usize, usize)) -> &mut Self::Output {
+        &mut self.0[index.0 * 9 + index.1]
     }
 }
 
