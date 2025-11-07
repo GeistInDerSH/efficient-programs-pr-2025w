@@ -13,37 +13,37 @@ fn file_io(c: &mut Criterion) {
 }
 
 fn invalid_boards(c: &mut Criterion) {
-    c.bench_function("solve for invalid board (multiple collisions)", |b| {
+    c.bench_function("invalid (multiple collisions)", |b| {
         b.iter(|| sudoku_solver::example_boards::INVALID_BOARD_ROW_AND_COL_COLLISION.solve());
     });
-    c.bench_function("solve for invalid board (row collisions)", |b| {
+    c.bench_function("invalid (row collisions)", |b| {
         b.iter(|| sudoku_solver::example_boards::INVALID_BOARD_ROW_COLLISION.solve());
     });
-    c.bench_function("solve for invalid board (col collisions)", |b| {
+    c.bench_function("invalid (col collisions)", |b| {
         b.iter(|| sudoku_solver::example_boards::INVALID_BOARD_COL_COLLISION.solve());
     });
-    c.bench_function("solve for invalid board (box collisions)", |b| {
+    c.bench_function("invalid (box collisions)", |b| {
         b.iter(|| sudoku_solver::example_boards::INVALID_BOARD_BOX_COLLISION.solve());
     });
 }
 
 fn solvable_boards(c: &mut Criterion) {
-    c.bench_function("solve for valid board (easy)", |b| {
+    c.bench_function("solvable (easy)", |b| {
         b.iter(|| sudoku_solver::example_boards::EASY_BOARD.solve());
     });
-    c.bench_function("solve for valid board (medium)", |b| {
+    c.bench_function("solvable (medium)", |b| {
         b.iter(|| sudoku_solver::example_boards::MEDIUM_BOARD.solve());
     });
-    c.bench_function("solve for valid board (hard)", |b| {
+    c.bench_function("solvable (hard)", |b| {
         b.iter(|| sudoku_solver::example_boards::HARD_BOARD.solve());
     });
-    c.bench_function("solve for valid board (extra hard)", |b| {
+    c.bench_function("solvable (extra hard)", |b| {
         b.iter(|| sudoku_solver::example_boards::EXTRA_HARD_BOARD.solve());
     });
-    c.bench_function("solve for valid board (2x hard)", |b| {
+    c.bench_function("solvable (2x hard)", |b| {
         b.iter(|| sudoku_solver::example_boards::HARD_2X_BOARD.solve());
     });
-    c.bench_function("solve for valid board (solved)", |b| {
+    c.bench_function("solvable (solved)", |b| {
         b.iter(|| sudoku_solver::example_boards::SOLVED_BOARD.solve());
     });
 }
