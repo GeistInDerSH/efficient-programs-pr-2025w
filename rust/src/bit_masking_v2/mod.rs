@@ -10,7 +10,7 @@ use std::ops::Div;
 /// arrays of 9 u16s. This allows us to set the nth bit to indicate that the number has
 /// already been set in the row/column/box.
 fn solve(
-    solution_grid: &mut [u8; 81],
+    solution_grid: &mut Board,
     row_bits: &mut [u16; 9],
     col_bits: &mut [u16; 9],
     box_bits: &mut [u16; 9],
@@ -21,11 +21,10 @@ fn solve(
         true
     } else if col == 9 {
         solve(solution_grid, row_bits, col_bits, box_bits, row + 1, 0)
-    } else if solution_grid[row * 9 + col] != 0 {
+    } else if solution_grid[(row, col)] != 0 {
         solve(solution_grid, row_bits, col_bits, box_bits, row, col + 1)
     } else {
         let box_number = row.div(3) * 3 + col.div(3);
-        let offset = row * 9 + col;
         for p in 1..=9 {
             let mask = 1 << p;
 
@@ -41,7 +40,7 @@ fn solve(
             }
 
             // Set the values in the grid, and bitmask fields
-            solution_grid[offset] = p;
+            solution_grid[(row, col)] = p;
             row_bits[row] |= mask;
             col_bits[col] |= mask;
             box_bits[box_number] |= mask;
@@ -51,7 +50,7 @@ fn solve(
             }
 
             // Not a solution, so rollback the above masking
-            solution_grid[offset] = 0;
+            solution_grid[(row, col)] = 0;
             row_bits[row] &= !mask;
             col_bits[col] &= !mask;
             box_bits[box_number] &= !mask;
@@ -63,7 +62,7 @@ fn solve(
 
 impl super::SudokuSolver for Board {
     fn solve(&self) -> Option<Solution> {
-        let mut grid = self.0;
+        let mut grid = Board(self.0);
         let mut rows = [0; 9];
         let mut cols = [0; 9];
         let mut boxes = [0; 9];
@@ -71,9 +70,8 @@ impl super::SudokuSolver for Board {
         // No need to set custom logic to skip the 0th bit, as we won't ever check it
         // in the actual code
         for row in 0..9 {
-            let row_offset = row * 9;
             for col in 0..9 {
-                let value = grid[row_offset + col];
+                let value = grid[(row, col)];
                 if value == 0 {
                     continue;
                 }
@@ -98,7 +96,7 @@ impl super::SudokuSolver for Board {
         }
 
         if solve(&mut grid, &mut rows, &mut cols, &mut boxes, 0, 0) {
-            Some(grid.into())
+            Some(grid)
         } else {
             None
         }

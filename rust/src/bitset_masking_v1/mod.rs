@@ -18,7 +18,7 @@ impl BitSet {
         }
     }
 
-    fn try_configure_from(board: &[u8; 81]) -> Option<Self> {
+    fn try_configure_from(board: &Board) -> Option<Self> {
         let mut bit_set = BitSet::new();
 
         // No need to set custom logic to skip the 0th bit, as we won't ever check it
@@ -27,7 +27,7 @@ impl BitSet {
             let row_offset = row * 9;
             let row_box = row.div(3) * 3;
             for col in 0..9 {
-                let value = board[row_offset + col] as usize;
+                let value = board[(row, col)] as usize;
                 if value == 0 {
                     continue;
                 }
@@ -96,7 +96,7 @@ impl BitSet {
 /// Additionally, track which bits have already been set in the grid by using three
 /// arrays of 9 u16s. This allows us to set the nth bit to indicate that the number has
 /// already been set in the row/column/box.
-fn solve(solution_grid: &mut [u8; 81], bit_set: &mut BitSet, row: usize, col: usize) -> bool {
+fn solve(solution_grid: &mut Board, bit_set: &mut BitSet, row: usize, col: usize) -> bool {
     if row == 9 {
         return true;
     }
@@ -105,7 +105,7 @@ fn solve(solution_grid: &mut [u8; 81], bit_set: &mut BitSet, row: usize, col: us
         return solve(solution_grid, bit_set, row + 1, 0);
     }
 
-    let offset = row * 9 + col;
+    let offset = (row, col);
     if solution_grid[offset] != 0 {
         solve(solution_grid, bit_set, row, col + 1)
     } else {
@@ -150,10 +150,10 @@ fn solve(solution_grid: &mut [u8; 81], bit_set: &mut BitSet, row: usize, col: us
 
 impl super::SudokuSolver for Board {
     fn solve(&self) -> Option<Solution> {
-        let mut bit_set = BitSet::try_configure_from(&self.0)?;
-        let mut grid = self.0;
+        let mut bit_set = BitSet::try_configure_from(self)?;
+        let mut grid = Board(self.0);
         if solve(&mut grid, &mut bit_set, 0, 0) {
-            Some(grid.into())
+            Some(grid)
         } else {
             None
         }
