@@ -48,6 +48,50 @@ fn solvable_boards(c: &mut Criterion) {
     });
 }
 
-criterion_group!(io, file_io);
+fn print_boards(c: &mut Criterion) {
+    c.bench_function("print (easy)", |b| {
+        let solution = sudoku_solver::example_boards::EASY_BOARD.solve().unwrap();
+        b.iter(|| {
+            let _ = std::hint::black_box(format!("{solution}"));
+        });
+    });
+    c.bench_function("print (medium)", |b| {
+        let solution = sudoku_solver::example_boards::MEDIUM_BOARD.solve().unwrap();
+        b.iter(|| {
+            let _ = std::hint::black_box(format!("{solution}"));
+        });
+    });
+    c.bench_function("print (hard)", |b| {
+        let solution = sudoku_solver::example_boards::HARD_BOARD.solve().unwrap();
+
+        b.iter(|| {
+            let _ = std::hint::black_box(format!("{solution}"));
+        });
+    });
+    c.bench_function("print (extra hard)", |b| {
+        let solution = sudoku_solver::example_boards::EXTRA_HARD_BOARD
+            .solve()
+            .unwrap();
+        b.iter(|| {
+            let _ = std::hint::black_box(format!("{solution}"));
+        });
+    });
+    c.bench_function("print solution (2x hard)", |b| {
+        let solution = sudoku_solver::example_boards::HARD_2X_BOARD
+            .solve()
+            .unwrap();
+        b.iter(|| {
+            let _ = std::hint::black_box(format!("{solution}"));
+        });
+    });
+    c.bench_function("print solution (solved)", |b| {
+        let solution = sudoku_solver::example_boards::SOLVED_BOARD.solve().unwrap();
+        b.iter(|| {
+            let _ = std::hint::black_box(format!("{solution}"));
+        });
+    });
+}
+
+criterion_group!(io, file_io, print_boards);
 criterion_group!(boards, solvable_boards, invalid_boards);
 criterion_main!(io, boards);
