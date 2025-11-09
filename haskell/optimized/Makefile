@@ -15,7 +15,7 @@ RUNS      = 5
 all: $(BIN)
 
 $(BIN): $(SRC)
-	$(GHC)  -o $(BIN) $(SRC) 	
+	$(GHC) -O2 -threaded -rtsopts -o $(BIN) $(SRC) 	
 
 bench: $(BIN)
 	@echo "Running benchmarks on all Sudoku boards in $(BOARDSDIR)"
