@@ -1,13 +1,18 @@
 use std::fmt::{Debug, Display};
 use std::io;
 use std::io::Read;
+use std::ops::{Index, IndexMut};
 
 #[cfg(feature = "solve_basic")]
 pub mod basic;
-#[cfg(feature = "solve_grid_bit_masking")]
-pub mod grid_bit_masking;
-#[cfg(feature = "solve_grid_bit_masking_bitset")]
-pub mod grid_bit_masking_bitset;
+#[cfg(feature = "solve_basic_std_index")]
+pub mod basic_std_index;
+#[cfg(feature = "solve_bit_masking_v1")]
+pub mod bit_masking_v1;
+#[cfg(feature = "solve_bit_masking_v2")]
+pub mod bit_masking_v2;
+#[cfg(feature = "solve_bitset_masking_v1")]
+pub mod bitset_masking_v1;
 
 /// The [`SudokuSolver`] trait is one that any solution attempt should implement on [`Board`] in
 /// a submodule. That submodule should then be conditionally imported if a feature flag is set.
@@ -85,6 +90,23 @@ impl Display for Board {
     }
 }
 
+/// Add support for (row, col) indexing to make it easier to work with the Board
+impl Index<(usize, usize)> for Board {
+    type Output = u8;
+
+    fn index(&self, index: (usize, usize)) -> &Self::Output {
+        &self.0[index.0 * 9 + index.1]
+    }
+}
+
+/// Add support for (row, col) indexing to make it easier to work with the Board, and
+/// mutating the value at the index.
+impl IndexMut<(usize, usize)> for Board {
+    fn index_mut(&mut self, index: (usize, usize)) -> &mut Self::Output {
+        &mut self.0[index.0 * 9 + index.1]
+    }
+}
+
 impl Debug for Board {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{self}")
@@ -102,7 +124,7 @@ pub fn read_file(filename: &str) -> io::Result<Board> {
 
     // 9 rows of 10 chars, but the last may leave out the new-line
     let mut data = [0; 89];
-    file.read_exact(&mut data)?;
+    let _ = file.read(&mut data)?;
 
     // Copy bytes out of the string. Each line should be 10 bytes long, 9 digits and 1 new line.
     // Because of the new line, we need to add a small correction when addressing into the 1d array
@@ -152,7 +174,7 @@ macro_rules! time_it {
 }
 
 pub mod example_boards {
-    use super::*;
+    use super::Board;
 
     const fn board_from_2d(array: [[u8; 9]; 9]) -> Board {
         let mut buff = [0; 81];
@@ -357,5 +379,12 @@ mod tests {
         let board = example_boards::INVALID_BOARD_BOX_COLLISION;
         let solution = board.solve();
         assert!(solution.is_none());
+    }
+
+    #[test]
+    fn solved_board_to_string() {
+        let board = example_boards::SOLVED_BOARD.to_string();
+        let expected = "139246758\n572813469\n468795132\n287564391\n941372685\n653189274\n726458913\n315927846\n894631527\n";
+        assert_eq!(expected, board);
     }
 }
