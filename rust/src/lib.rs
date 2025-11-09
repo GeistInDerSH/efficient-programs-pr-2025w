@@ -11,6 +11,8 @@ pub mod basic_std_index;
 pub mod bit_masking_v1;
 #[cfg(feature = "solve_bit_masking_v2")]
 pub mod bit_masking_v2;
+#[cfg(feature = "solve_bit_masking_v3")]
+pub mod bit_masking_v3;
 #[cfg(feature = "solve_bitset_masking_v1")]
 pub mod bitset_masking_v1;
 

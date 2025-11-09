@@ -9,6 +9,7 @@ solve_basic = []
 solve_basic_std_index = []
 solve_bit_masking_v1 = []
 solve_bit_masking_v2 = []
+solve_bit_masking_v3 = []
 solve_bitset_masking_v1 = []
 measure_runtime = []
 
@@ -20,6 +21,11 @@ criterion = "0.7.0"
 [[bench]]
 name = "benchmarks"
 harness = false
+
+[profile.test]
+# Needed because solve_bit_masking_v3 relies on this,
+# which is not set in the release mode
+overflow-checks = false
 
 [profile.release]
 codegen-units = 1
