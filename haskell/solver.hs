@@ -1,6 +1,7 @@
 -- Sudoku.hs
--- Sudoku solver that accepts input with '-' for blanks
+-- Sudoku solver that accepts input with 0 or '-' for blanks
 
+import System.Environment (getArgs)
 import Data.List (transpose, minimumBy, (\\), intercalate)
 import Data.Maybe (listToMaybe)
 import Data.Ord (comparing)
@@ -15,8 +16,9 @@ digits = [1..9]
 parseGrid :: [String] -> Maybe Grid
 parseGrid ls
   | length ls /= 9 = Nothing
-  | otherwise = traverse parseLine ls
+  | otherwise = traverse parseLine validLines
   where
+    validLines = filter (not . null) $ map (filter (`elem` "0123456789-")) ls
     parseLine s
       | length s /= 9 = Nothing
       | otherwise = Just $ map charToCell s
@@ -32,21 +34,27 @@ showGrid g = intercalate "\n" $ map showRow g
     showRow r = concatMap showCell r
     showCell 0 = "0 "
     showCell n = show n ++ " "
+
+  
 -- Return the value at a given position
 valueAt :: Grid -> Pos -> Int
 valueAt g (r,c) = g !! r !! c
+
 -- Update the grid by one cell (This creates a new grid every time it is called)
 updateGrid :: Grid -> Pos -> Int -> Grid
 updateGrid g (r,c) val =
   take r g ++
   [take c (g !! r) ++ [val] ++ drop (c+1) (g !! r)] ++
   drop (r+1) g
+
 -- Give all non-zero values in the specified row
 rowVals :: Grid -> Int -> [Int]
 rowVals g r = filter (/= 0) (g !! r)
+
 -- Give all non-zero values in the specified column
 colVals :: Grid -> Int -> [Int]
 colVals g c = filter (/= 0) $ map (!! c) g
+
 -- Give all non-zero values in the specified 3x3 block
 blockVals :: Grid -> Pos -> [Int]
 blockVals g (r,c) = filter (/= 0)
@@ -57,6 +65,7 @@ blockVals g (r,c) = filter (/= 0)
   where
     br = (r `div` 3) * 3
     bc = (c `div` 3) * 3
+
 -- If the cell is filled, do not return any candidates
 -- Otherwise, return digits not used in the same row, column, or block
 candidates :: Grid -> Pos -> [Int]
@@ -65,6 +74,7 @@ candidates g (r,c)
   | otherwise = digits \\ used
   where
     used = rowVals g r ++ colVals g c ++ blockVals g (r,c)
+
 -- Find all empty cells in the grid
 emptyPositions :: Grid -> [Pos]
 emptyPositions g = [ (r,c) | r <- [0..8], c <- [0..8], valueAt g (r,c) == 0 ]
@@ -80,6 +90,7 @@ selectPos g =
   where
     positions = emptyPositions g
     candidatesNonEmpty = [ (p, candidates g p) | p <- positions, not (null (candidates g p)) ]
+    
 -- If there are no empty positions left, return the grid as a solution
 -- otherwise, continue
 solve :: Grid -> [Grid]
@@ -96,12 +107,19 @@ solve g
 solveOnce :: Grid -> Maybe Grid
 solveOnce g = listToMaybe (solve g)
 
+-- Main: read a file instead of stdin
 main :: IO ()
 main = do
-  putStrLn "Enter 9 lines of 9 characters (digits or '-' or 0 for empty):"
-  ls <- fmap lines getContents
-  case parseGrid (take 9 ls) of
-    Nothing -> putStrLn "Invalid input (need exactly 9 lines of 9 chars)."
-    Just grid -> case solveOnce grid of
-      Nothing -> putStrLn "No solution found."
-      Just sol -> putStrLn $ "Solved Sudoku:\n" ++ showGrid sol
+  args <- getArgs
+  case args of
+    [filePath] -> do
+      content <- readFile filePath
+      let ls = lines content
+      --putStrLn $ "Read " ++ show (length ls) ++ " lines"
+      --mapM_ print ls
+      case parseGrid (take 9 ls) of
+        Nothing -> putStrLn "Invalid input (need exactly 9 lines of 9 chars)."
+        Just grid -> case solveOnce grid of
+          Nothing -> putStrLn "No solution found."
+          Just sol -> putStrLn $ "Solved Sudoku:\n" ++ showGrid sol
+    _ -> putStrLn "Usage: ./solver <board_file>"
