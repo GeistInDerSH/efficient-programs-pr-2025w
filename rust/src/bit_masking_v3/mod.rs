@@ -18,6 +18,25 @@ struct Solver {
 
 impl Solver {
     fn solve(&mut self, index: usize) -> bool {
+        // Sort so the cell with the least number of candidates is first. The idea
+        // being we can solve the easy ones first, then it helps to eliminate options
+        // for cells with more possibilities
+        #[cfg(feature = "priority_queue")]
+        self.todo[index..].sort_by(|a, b| {
+            let a_count = {
+                let (row, col, box_num) = a;
+                let candidates = self.rows[*row] & self.cols[*col] & self.boxes[*box_num];
+                candidates.count_ones()
+            };
+            let b_count = {
+                let (row, col, box_num) = b;
+                let candidates = self.rows[*row] & self.cols[*col] & self.boxes[*box_num];
+                candidates.count_ones()
+            };
+
+            a_count.cmp(&b_count)
+        });
+
         let (row, col, box_num) = self.todo[index];
 
         let mut candidates = self.rows[row] & self.cols[col] & self.boxes[box_num];
