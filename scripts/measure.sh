@@ -108,7 +108,14 @@ if [ 1 -eq "$measure_overhead" ]; then
   average_startup_time_ns=$(measure_average_runtime "date" "+%s%N" "$runs")
 fi
 
-average_time_ns=$(($(measure_average_runtime $binary $board "$runs")-average_startup_time_ns))
+average_time_ns=$(measure_average_runtime $binary $board "$runs")
+difference=$((average_time_ns-average_startup_time_ns))
+if [ $difference -lt 0 ]; then
+  echo "[WARN] Measured shell overhead is larger than program. Ignoring overhead"
+  average_startup_time_ns=0
+fi
+
+average_time_ns=$((average_time_ns-average_startup_time_ns))
 average_time_us=$((average_time_ns/1000))
 average_time_ms=$((average_time_us/1000))
 
