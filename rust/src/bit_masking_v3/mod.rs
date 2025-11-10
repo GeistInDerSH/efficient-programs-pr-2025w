@@ -103,12 +103,18 @@ fn clear_low_bit(value: u16) -> u16 {
 /// Convert a [`u16`] with a single bit set into a [`u8`] value
 /// representing the index of the bit set.
 fn pos_to_value(pos: u16) -> u8 {
-    for i in 0..10 {
-        if pos & (1 << i) != 0 {
-            return i as u8;
-        }
+    match pos {
+        1 => 1,
+        2 => 2,
+        4 => 3,
+        8 => 4,
+        16 => 5,
+        32 => 6,
+        64 => 7,
+        128 => 8,
+        256 => 9,
+        _ => panic!("Invalid position: {}", pos),
     }
-    0
 }
 
 impl crate::SudokuSolver for Board {
