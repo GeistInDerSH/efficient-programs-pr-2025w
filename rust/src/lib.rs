@@ -1,4 +1,4 @@
-use std::fmt::{Debug, Display};
+use std::fmt::{Debug, Display, Write};
 use std::io;
 use std::io::Read;
 use std::ops::{Index, IndexMut};
@@ -82,12 +82,14 @@ impl From<[[u8; 9]; 9]> for Board {
 
 impl Display for Board {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for row in 0..9 {
-            for col in 0..9 {
-                write!(f, "{}", self.0[row * 9 + col])?;
+        for (i, v) in self.0.iter().enumerate() {
+            match i {
+                9 | 18 | 27 | 36 | 45 | 54 | 63 | 72 | 81 => f.write_char('\n')?,
+                _ => {}
             }
-            writeln!(f)?;
+            f.write_char((*v + b'0') as char)?;
         }
+        f.write_char('\n')?;
         Ok(())
     }
 }
