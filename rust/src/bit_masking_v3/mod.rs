@@ -1,7 +1,7 @@
 use crate::{Board, Solution};
 
 /// All bits for the value have been seen
-const ALL_BITS_SET: u16 = 0b111111111;
+const ALL_BITS_SET: u16 = 0b1_1111_1111;
 
 type RowEntry = usize;
 type ColEntry = usize;
@@ -80,8 +80,10 @@ impl TryFrom<Board> for Solver {
     type Error = &'static str;
 
     fn try_from(board: Board) -> Result<Self, Self::Error> {
-        let mut solver = Solver::default();
-        solver.board = board;
+        let mut solver = Solver {
+            board,
+            ..Default::default()
+        };
 
         for row in 0..9 {
             for col in 0..9 {
@@ -132,7 +134,7 @@ fn pos_to_value(pos: u16) -> u8 {
         64 => 7,
         128 => 8,
         256 => 9,
-        _ => panic!("Invalid position: {}", pos),
+        _ => panic!("Invalid position: {pos}"),
     }
 }
 

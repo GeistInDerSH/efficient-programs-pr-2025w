@@ -1,4 +1,4 @@
-/// Similar to bit_masking_v1, but delays the compares by bitwise-or'ing
+/// Similar to `bit_masking_v1`, but delays the compares by bitwise-or'ing
 /// the values then comparing the result all at once. This avoids extra
 /// compare/jump instructions.
 use crate::{Board, Solution};
