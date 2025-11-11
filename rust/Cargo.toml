@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [features]
-default = ["solve_basic"]
+default = ["solve_bit_masking_v3_pq"]
 solve_basic = []
 solve_basic_std_index = []
 solve_bit_masking_v1 = []
