@@ -28,14 +28,8 @@ fn solve(
         for p in 1..=9 {
             let mask = 1 << p;
 
-            let any_seen = {
-                let mut seen = 0;
-                seen |= row_bits[row] & mask;
-                seen |= col_bits[col] & mask;
-                seen |= box_bits[box_number] & mask;
-                seen
-            };
-            if any_seen != 0 {
+            if (row_bits[row] & mask) | (col_bits[col] & mask) | (box_bits[box_number] & mask) != 0
+            {
                 continue;
             }
 
@@ -78,14 +72,7 @@ impl super::SudokuSolver for Board {
 
                 let box_number = row.div(3) * 3 + col.div(3);
                 let mask = 1 << value;
-                let any_seen = {
-                    let mut seen = 0;
-                    seen |= rows[row] & mask;
-                    seen |= cols[col] & mask;
-                    seen |= boxes[box_number] & mask;
-                    seen
-                };
-                if any_seen != 0 {
+                if (rows[row] & mask) | (cols[col] & mask) | (boxes[box_number] & mask) != 0 {
                     return None;
                 }
 
