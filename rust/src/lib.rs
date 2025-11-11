@@ -99,7 +99,14 @@ impl Index<(usize, usize)> for Board {
     type Output = u8;
 
     fn index(&self, index: (usize, usize)) -> &Self::Output {
-        &self.0[index.0 * 9 + index.1]
+        #[cfg(not(feature = "unchecked_indexing"))]
+        {
+            &self.0[index.0 * 9 + index.1]
+        }
+        #[cfg(feature = "unchecked_indexing")]
+        unsafe {
+            self.0.get_unchecked(index.0 * 9 + index.1)
+        }
     }
 }
 
@@ -107,7 +114,14 @@ impl Index<(usize, usize)> for Board {
 /// mutating the value at the index.
 impl IndexMut<(usize, usize)> for Board {
     fn index_mut(&mut self, index: (usize, usize)) -> &mut Self::Output {
-        &mut self.0[index.0 * 9 + index.1]
+        #[cfg(not(feature = "unchecked_indexing"))]
+        {
+            &mut self.0[index.0 * 9 + index.1]
+        }
+        #[cfg(feature = "unchecked_indexing")]
+        unsafe {
+            self.0.get_unchecked_mut(index.0 * 9 + index.1)
+        }
     }
 }
 
@@ -137,7 +151,14 @@ pub fn read_file(filename: &str) -> io::Result<Board> {
     for i in &data {
         match *i {
             b'0'..=b'9' => {
-                buffer[index] = *i - b'0';
+                #[cfg(not(feature = "unchecked_indexing"))]
+                {
+                    buffer[index] = *i - b'0';
+                }
+                #[cfg(feature = "unchecked_indexing")]
+                unsafe {
+                    *buffer.get_unchecked_mut(index) = *i - b'0';
+                }
                 index += 1;
             }
             b'\n' => {}

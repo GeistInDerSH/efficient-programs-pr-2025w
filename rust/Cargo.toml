@@ -11,9 +11,11 @@ solve_bit_masking_v1 = []
 solve_bit_masking_v2 = []
 solve_bit_masking_v3 = []
 solve_bit_masking_v3_pq = ["solve_bit_masking_v3", "priority_queue"]
+solve_bit_masking_v3_pq_ui = ["solve_bit_masking_v3", "priority_queue", "unchecked_indexing"]
 solve_bitset_masking_v1 = []
 measure_runtime = []
 priority_queue = []
+unchecked_indexing = []
 
 [dev-dependencies]
 criterion = "0.7.0"

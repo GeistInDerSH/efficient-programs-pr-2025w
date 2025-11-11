@@ -89,3 +89,12 @@ and as a result backtrack less for faster solutions.
 
 This offers a decent improvement over the base `src/bit_masking_v3`,
 and a significant improvement over `src/bit_masking_v2`
+
+#### Extension: `unchecked_indexing`
+
+Rust is generally fairly good about avoiding bounds checks in release
+code, however some is still inserted into the solver methods. Enabling
+this option changes accesses to use `unsafe` code for unchecked
+mutable/immutable gets.
+
+This offers only a very slight improvement.

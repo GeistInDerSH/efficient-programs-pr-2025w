@@ -17,6 +17,7 @@ struct Solver {
 }
 
 impl Solver {
+    #[cfg(not(feature = "unchecked_indexing"))]
     fn solve(&mut self, index: usize) -> bool {
         // Sort so the cell with the least number of candidates is first. The idea
         // being we can solve the easy ones first, then it helps to eliminate options
@@ -57,6 +58,57 @@ impl Solver {
             candidates = clear_low_bit(candidates);
         }
         false
+    }
+
+    #[cfg(feature = "unchecked_indexing")]
+    fn solve(&mut self, index: usize) -> bool {
+        unsafe {
+            // Sort so the cell with the least number of candidates is first. The idea
+            // being we can solve the easy ones first, then it helps to eliminate options
+            // for cells with more possibilities
+            #[cfg(feature = "priority_queue")]
+            self.todo.get_unchecked_mut(index..).sort_by(|a, b| {
+                let a_count = {
+                    let (row, col, box_num) = *a;
+                    let candidates = self.rows.get_unchecked(row)
+                        & self.cols.get_unchecked(col)
+                        & self.boxes.get_unchecked(box_num);
+                    candidates.count_ones()
+                };
+                let b_count = {
+                    let (row, col, box_num) = *b;
+                    let candidates = self.rows.get_unchecked(row)
+                        & self.cols.get_unchecked(col)
+                        & self.boxes.get_unchecked(box_num);
+                    candidates.count_ones()
+                };
+
+                a_count.cmp(&b_count)
+            });
+
+            let (row, col, box_num) = *self.todo.get_unchecked(index);
+
+            let mut candidates = self.rows.get_unchecked(row)
+                & self.cols.get_unchecked(col)
+                & self.boxes.get_unchecked(box_num);
+            while candidates != 0 {
+                let candidate = get_low_bit(candidates);
+                *self.rows.get_unchecked_mut(row) ^= candidate;
+                *self.cols.get_unchecked_mut(col) ^= candidate;
+                *self.boxes.get_unchecked_mut(box_num) ^= candidate;
+
+                if index == self.todo.len() - 1 || self.solve(index + 1) {
+                    self.board[(row, col)] = pos_to_value(candidate);
+                    return true;
+                }
+
+                *self.rows.get_unchecked_mut(row) |= candidate;
+                *self.cols.get_unchecked_mut(col) |= candidate;
+                *self.boxes.get_unchecked_mut(box_num) |= candidate;
+                candidates = clear_low_bit(candidates);
+            }
+            false
+        }
     }
 
     fn is_solved(&self) -> bool {
