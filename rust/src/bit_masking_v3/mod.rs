@@ -149,7 +149,7 @@ impl TryFrom<Board> for Solver {
                     // Because we are XORing the bits, if any of them are set to 0 then
                     // we have already seen it, and should bail because the board is invalid
                     if solver.rows[row] & solver.cols[col] & solver.boxes[box_number] & mask == 0 {
-                        return Err("Invalid box number");
+                        return Err("Invalid board");
                     }
 
                     solver.rows[row] ^= mask;
