@@ -19,6 +19,7 @@ measure_runtime = []
 unchecked_indexing = []
 constraint_solve_full_sort = []
 constraint_solve_minimal_sort = []
+raw_syscalls = []
 
 [dev-dependencies]
 criterion = "0.7.0"
@@ -36,13 +37,13 @@ overflow-checks = false
 
 [profile.release]
 codegen-units = 1
-debug = "none"
-debug-assertions = false
-incremental = false
+debug = true
+#debug-assertions = false
+#incremental = false
 lto = "fat"
 opt-level = 3
-overflow-checks = false
+#overflow-checks = false
 panic = "abort"
-rpath = false
-split-debuginfo = "off"
-strip = "symbols"
+#rpath = false
+#split-debuginfo = "off"
+#strip = "symbols"

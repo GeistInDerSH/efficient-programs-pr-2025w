@@ -107,7 +107,17 @@ to use both is made
 This is faster when compared to `constraint_solve_full_sort`, by a
 small amount.
 
-#### Extension: `unchecked_indexing`
+## Global Extensions
+
+### `measure_runtime`
+
+This instruments `src/main.rs` to measure how long it took for the program to run.
+This also allows for a 2nd argument to be given to the program to determine how many
+runs to do for the timing.
+
+This has no performance impact, and is just used for benchmarking and exploration.
+
+### `unchecked_indexing`
 
 Rust is generally fairly good about avoiding bounds checks in release
 code, however some is still inserted into the solver methods. Enabling
@@ -115,3 +125,12 @@ this option changes accesses to use `unsafe` code for unchecked
 mutable/immutable gets.
 
 This offers only a very slight improvement.
+
+### `raw_syscalls`
+
+`cargo flamegraph` showed that when the number of runs is large, there is a
+lot of time spend in the read syscall. This attempts to fix that by generating
+AMD64 Linux assembly inline to make the Open/Read/Write syscalls.
+
+The benefit is basically none when running it via the CLI, but is noticeable
+when running with `measure_runtime` because it can do many runs with file system IO.
