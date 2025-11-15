@@ -23,16 +23,14 @@ impl Solver {
         // being we can solve the easy ones first, then it helps to eliminate options
         // for cells with more possibilities
         #[cfg(feature = "priority_queue")]
-        self.todo[index..].sort_by(|a, b| {
+        self.todo[index..].sort_by(|&a, &b| {
             let a_count = {
                 let (row, col, box_num) = a;
-                let candidates = self.rows[*row] & self.cols[*col] & self.boxes[*box_num];
-                candidates.count_ones()
+                (self.rows[row] & self.cols[col] & self.boxes[box_num]).count_ones()
             };
             let b_count = {
                 let (row, col, box_num) = b;
-                let candidates = self.rows[*row] & self.cols[*col] & self.boxes[*box_num];
-                candidates.count_ones()
+                (self.rows[row] & self.cols[col] & self.boxes[box_num]).count_ones()
             };
 
             a_count.cmp(&b_count)
@@ -67,20 +65,20 @@ impl Solver {
             // being we can solve the easy ones first, then it helps to eliminate options
             // for cells with more possibilities
             #[cfg(feature = "priority_queue")]
-            self.todo.get_unchecked_mut(index..).sort_by(|a, b| {
+            self.todo.get_unchecked_mut(index..).sort_by(|&a, &b| {
                 let a_count = {
-                    let (row, col, box_num) = *a;
-                    let candidates = self.rows.get_unchecked(row)
+                    let (row, col, box_num) = a;
+                    (self.rows.get_unchecked(row)
                         & self.cols.get_unchecked(col)
-                        & self.boxes.get_unchecked(box_num);
-                    candidates.count_ones()
+                        & self.boxes.get_unchecked(box_num))
+                    .count_ones()
                 };
                 let b_count = {
-                    let (row, col, box_num) = *b;
-                    let candidates = self.rows.get_unchecked(row)
+                    let (row, col, box_num) = b;
+                    (self.rows.get_unchecked(row)
                         & self.cols.get_unchecked(col)
-                        & self.boxes.get_unchecked(box_num);
-                    candidates.count_ones()
+                        & self.boxes.get_unchecked(box_num))
+                    .count_ones()
                 };
 
                 a_count.cmp(&b_count)
