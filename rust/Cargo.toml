@@ -4,16 +4,22 @@ version = "0.1.0"
 edition = "2024"
 
 [features]
-default = ["solve_basic"]
+default = ["solve_bit_masking_v3_cs_full"]
 solve_basic = []
 solve_basic_std_index = []
 solve_bit_masking_v1 = []
 solve_bit_masking_v2 = []
 solve_bit_masking_v3 = []
-solve_bit_masking_v3_pq = ["solve_bit_masking_v3", "priority_queue"]
+solve_bit_masking_v3_cs_full = ["solve_bit_masking_v3", "constraint_solve_full_sort"]
+solve_bit_masking_v3_cs_full_ui = ["solve_bit_masking_v3", "constraint_solve_full_sort", "unchecked_indexing"]
+solve_bit_masking_v3_cs_min = ["solve_bit_masking_v3", "constraint_solve_minimal_sort"]
+solve_bit_masking_v3_cs_min_ui = ["solve_bit_masking_v3", "constraint_solve_minimal_sort", "unchecked_indexing"]
 solve_bitset_masking_v1 = []
 measure_runtime = []
-priority_queue = []
+unchecked_indexing = []
+constraint_solve_full_sort = []
+constraint_solve_minimal_sort = []
+raw_syscalls = []
 
 [dev-dependencies]
 criterion = "0.7.0"
@@ -31,7 +37,7 @@ overflow-checks = false
 
 [profile.release]
 codegen-units = 1
-debug = "none"
+debug = true
 debug-assertions = false
 incremental = false
 lto = "fat"

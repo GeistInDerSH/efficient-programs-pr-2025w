@@ -1,5 +1,6 @@
-use std::fmt::{Debug, Display};
+use std::fmt::{Debug, Display, Write};
 use std::io;
+#[allow(unused)]
 use std::io::Read;
 use std::ops::{Index, IndexMut};
 
@@ -82,12 +83,13 @@ impl From<[[u8; 9]; 9]> for Board {
 
 impl Display for Board {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for row in 0..9 {
-            for col in 0..9 {
-                write!(f, "{}", self.0[row * 9 + col])?;
+        for (i, v) in self.0.iter().enumerate() {
+            if matches!(i, 9 | 18 | 27 | 36 | 45 | 54 | 63 | 72 | 81) {
+                f.write_char('\n')?;
             }
-            writeln!(f)?;
+            f.write_char((*v + b'0') as char)?;
         }
+        f.write_char('\n')?;
         Ok(())
     }
 }
@@ -97,7 +99,14 @@ impl Index<(usize, usize)> for Board {
     type Output = u8;
 
     fn index(&self, index: (usize, usize)) -> &Self::Output {
-        &self.0[index.0 * 9 + index.1]
+        #[cfg(not(feature = "unchecked_indexing"))]
+        {
+            &self.0[index.0 * 9 + index.1]
+        }
+        #[cfg(feature = "unchecked_indexing")]
+        unsafe {
+            self.0.get_unchecked(index.0 * 9 + index.1)
+        }
     }
 }
 
@@ -105,7 +114,14 @@ impl Index<(usize, usize)> for Board {
 /// mutating the value at the index.
 impl IndexMut<(usize, usize)> for Board {
     fn index_mut(&mut self, index: (usize, usize)) -> &mut Self::Output {
-        &mut self.0[index.0 * 9 + index.1]
+        #[cfg(not(feature = "unchecked_indexing"))]
+        {
+            &mut self.0[index.0 * 9 + index.1]
+        }
+        #[cfg(feature = "unchecked_indexing")]
+        unsafe {
+            self.0.get_unchecked_mut(index.0 * 9 + index.1)
+        }
     }
 }
 
@@ -115,6 +131,69 @@ impl Debug for Board {
     }
 }
 
+/// A quick shortcut to allow for "raw" x64 syscalls to be made on Linux.
+/// This is controlled via the `raw_syscalls` feature flag. Because we only
+/// use it for Open/Read/Close (in that order).
+///
+/// This was only made because using `cargo flamegraph` showed that when there
+/// are lots of runs, the main function spends a lot of time in the Rust
+/// fs::open function. This is likely because of some ffi reasons of converting
+/// between Rust strings and C-Strings.
+#[allow(unused)]
+#[inline(always)]
+#[cfg(all(feature = "raw_syscalls", target_arch = "x86_64", target_os = "linux"))]
+fn x64_linux_syscall(syscall_id: u64, rdi: u64, rsi: u64, rdx: u64) -> i64 {
+    let ret: i64;
+    unsafe {
+        std::arch::asm!(
+        "syscall",
+        in("rax") syscall_id,
+        in("rdi") rdi,
+        in("rsi") rsi,
+        in("rdx") rdx,
+        lateout("rax") ret,
+        options(nostack)
+        );
+    }
+    ret
+}
+
+#[allow(unused)]
+#[inline(always)]
+#[cfg(all(feature = "raw_syscalls", target_arch = "x86_64", target_os = "linux"))]
+fn read_to_buffer(filename: &str) -> io::Result<[u8; 89]> {
+    // Syscall ID and expected register value information pulled from:
+    // https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/
+    // This info is also in the Linux Kernel, but the above table include the
+    // registers, and what the contents should be.
+    const SYSCALL_READ: u64 = 0;
+    const SYSCALL_OPEN: u64 = 2;
+    const SYSCALL_CLOSE: u64 = 3;
+
+    let c_file_path = std::ffi::CString::new(filename)?;
+    let path_ptr = c_file_path.as_ptr() as u64;
+    let fd: i64 = x64_linux_syscall(SYSCALL_OPEN, path_ptr, 0, 0);
+    if fd < 0 {
+        return Err(io::Error::other("Failed to open file"));
+    }
+    let fd = fd as u64;
+
+    let mut data = [0u8; 89];
+    let bytes_read = x64_linux_syscall(
+        SYSCALL_READ,
+        fd,
+        data.as_mut_ptr() as u64,
+        data.len() as u64,
+    );
+    if bytes_read == !0 {
+        return Err(io::Error::other("Failed to read file"));
+    }
+
+    x64_linux_syscall(SYSCALL_CLOSE, fd, 0, 0);
+
+    Ok(data)
+}
+
 /// Attempt to read a sudoku board from a file.
 ///
 /// # Errors
@@ -122,11 +201,17 @@ impl Debug for Board {
 /// * The file is smaller than 89 bytes
 /// * Data in the file is not digits 0 to 9
 pub fn read_file(filename: &str) -> io::Result<Board> {
-    let mut file = std::fs::File::open(filename)?;
+    #[cfg(not(all(feature = "raw_syscalls", target_os = "linux", target_arch = "x86_64")))]
+    let data = {
+        let mut file = std::fs::File::open(filename)?;
 
-    // 9 rows of 10 chars, but the last may leave out the new-line
-    let mut data = [0; 89];
-    let _ = file.read(&mut data)?;
+        // 9 rows of 10 chars, but the last may leave out the new-line
+        let mut data = [0; 89];
+        let _ = file.read(&mut data)?;
+        data
+    };
+    #[cfg(all(feature = "raw_syscalls", target_arch = "x86_64", target_os = "linux"))]
+    let data = read_to_buffer(filename)?;
 
     // Copy bytes out of the string. Each line should be 10 bytes long, 9 digits and 1 new line.
     // Because of the new line, we need to add a small correction when addressing into the 1d array
@@ -135,7 +220,14 @@ pub fn read_file(filename: &str) -> io::Result<Board> {
     for i in &data {
         match *i {
             b'0'..=b'9' => {
-                buffer[index] = *i - b'0';
+                #[cfg(not(feature = "unchecked_indexing"))]
+                {
+                    buffer[index] = *i - b'0';
+                }
+                #[cfg(feature = "unchecked_indexing")]
+                unsafe {
+                    *buffer.get_unchecked_mut(index) = *i - b'0';
+                }
                 index += 1;
             }
             b'\n' => {}

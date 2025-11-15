@@ -77,7 +77,7 @@ function measure_average_runtime () {
   times=()
   for _ in $(seq "${runs}"); do
     time_start=$(date +%s%N)
-    $binary "$board" > /dev/null
+    $binary $board > /dev/null
     time_end=$(date +%s%N)
     runtime_ns=$((time_end-time_start))
     times+=("$runtime_ns")
@@ -108,7 +108,7 @@ if [ 1 -eq "$measure_overhead" ]; then
   average_startup_time_ns=$(measure_average_runtime "date" "+%s%N" "$runs")
 fi
 
-average_time_ns=$(measure_average_runtime $binary $board "$runs")
+average_time_ns=$(measure_average_runtime "$binary" "$board" "$runs")
 difference=$((average_time_ns-average_startup_time_ns))
 if [ $difference -lt 0 ]; then
   echo "[WARN] Measured shell overhead is larger than program. Ignoring overhead"
