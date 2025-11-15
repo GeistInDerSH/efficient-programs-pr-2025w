@@ -83,9 +83,8 @@ impl From<[[u8; 9]; 9]> for Board {
 impl Display for Board {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for (i, v) in self.0.iter().enumerate() {
-            match i {
-                9 | 18 | 27 | 36 | 45 | 54 | 63 | 72 | 81 => f.write_char('\n')?,
-                _ => {}
+            if matches!(i, 9 | 18 | 27 | 36 | 45 | 54 | 63 | 72 | 81) {
+                f.write_char('\n')?;
             }
             f.write_char((*v + b'0') as char)?;
         }
