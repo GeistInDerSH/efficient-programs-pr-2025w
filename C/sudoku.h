@@ -3,13 +3,16 @@
 
 #include <stdint.h> // For uint8_t
 #include <stdio.h>  // For FILE
+#include <string.h>
+
+struct Board;
 
 typedef int (*SolverFunc)(struct Board*, struct Board*);
 
 // Board is a one-dimensional array (1d) of bytes
-// I used uint8_t because it is enough (the numbers from 1 to 9 will fit)
+// I used uint8_t because it is just enough (the numbers from 1 to 9 will fit)
 struct Board {
-    uint8_t cells[81]; // 81 bytes in total
+    uint8_t cells[81];
 };
 
 // Solution is an alias for Board
@@ -22,19 +25,26 @@ typedef struct Board Solution;
  */
 int read_file(struct Board* board, const char* filename);
 
-/*
- * Solves the Sudoku puzzle.
- * "input" is the unsolved puzzle (it is not modified).
- * "solution" is the solved Sudoku puzzle
- * Returns 1 if a solution is found, 0 if no solution exists.
- */
-int solve( struct Board* input, struct Board* solution);
-
-
-
 /**
  * Prints the board 
  */
 void print_board(const struct Board* board);
+
+/**
+ * Prints the board in a professional manner
+ */
+void print_board_enhanced(const struct Board* board);
+
+/*
+* Checks if the solution is valid
+*/
+int is_solution_valid(const struct Board* board);
+
+/*
+* Checks if the board is valid
+*/
+int is_board_valid(const struct Board* board);
+
+
 
 #endif // SUDOKU_H

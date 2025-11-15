@@ -1,13 +1,13 @@
 # Compiler and flags
 CC = gcc
-CFLAGS = -Wall -Wextra -O2 -g  # Warnings, Optimization, Debug symbols
+CFLAGS = -Wall -Wextra  # Warnings, Optimization, Debug symbols
 
 # Executable names
 EXECUTABLE = sudoku_solver
 BENCHMARK = sudoku_bench
 
 # Object files for the library
-LIB_OBJS = sudoku.o sudoku_optimized_v1.o sudoku_optimized_v2.o
+LIB_OBJS = sudoku.o sudoku_unoptimized.o sudoku_optimized_v0.o sudoku_optimized_v1.o sudoku_optimized_v2.o sudoku_optimized_v3.o sudoku_optimized_v4.o sudoku_optimized_v5.o 
 
 all: $(EXECUTABLE) $(BENCHMARK)
 

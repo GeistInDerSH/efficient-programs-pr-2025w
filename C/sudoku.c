@@ -3,48 +3,6 @@
 #include <stdlib.h>
 #include <string.h> 
 
-static inline int is_valid(const struct Board* board, int row, int col, uint8_t value) {
-    uint8_t* cells = board->cells;
-    int row_offset = row * 9;
-
-    // Check row
-    for (int c = 0; c < 9; c++) {
-        if (cells[row_offset + c] == value) return 0;
-    }
-
-    // Check column
-    for (int r = 0; r < 9; r++) {
-        if (cells[r * 9 + col] == value) return 0;
-    }
-
-    // Check 3x3 box
-    int box_row_start = (row / 3) * 3;
-    int box_col_start = (col / 3) * 3;
-    for (int r = 0; r < 3; r++) {
-        int row_idx = (box_row_start + r) * 9;
-        for (int c = 0; c < 3; c++) {
-            if (cells[row_idx + box_col_start + c] == value) return 0;
-        }
-    }
-
-    return 1;
-}
-
-static int solve_recursive(struct Board* board, int row, int col) {
-    if (row == 9) return 1;
-    if (col == 9) return solve_recursive(board, row + 1, 0);
-    if (board->cells[row * 9 + col] != 0) return solve_recursive(board, row, col + 1);
-
-    for (uint8_t p = 1; p <= 9; p++) {
-        if (!is_valid(board, row, col, p)) continue;
-        board->cells[row * 9 + col] = p;
-        if (solve_recursive(board, row, col + 1)) return 1;
-        board->cells[row * 9 + col] = 0;
-    }
-
-    return 0;
-}
-
 int read_file(struct Board* board, const char* filename) {
 
     FILE* file = fopen(filename, "r");
@@ -68,16 +26,6 @@ int read_file(struct Board* board, const char* filename) {
     return (cell_index == 81) ? 0 : 1;
 }
 
-int solve( struct Board* input, struct Board* solution) {
-
-    // printf("solve\n");
-    memcpy(solution, input, sizeof(struct Board));
-
-    return solve_recursive(solution, 0, 0);
-}
-
-
-
 void print_board(const struct Board* board) {
 
     const uint8_t* cells = board->cells;
@@ -90,7 +38,6 @@ void print_board(const struct Board* board) {
     }
 }
 
-// Print board enhanced 
 void print_board_enhanced(const struct Board* board) {
     const uint8_t* cells = board->cells;
 
@@ -120,6 +67,97 @@ void print_board_enhanced(const struct Board* board) {
                  putchar(' ');
             }
         }
-        putchar('\n'); // Next line ...
+        putchar('\n'); // PRoceed to the next line ...
     }
+}
+
+int is_solution_valid(const struct Board* board) {
+    
+    // 'seen' arrays act as a "Set" for each group.
+    // We need 9 checkers for rows, 9 for columns, and 9 for boxes.
+    // Size 10 to use the number's value (1-9) directly as an index.
+    uint8_t seen_rows[9][10] = {0};
+    uint8_t seen_cols[9][10] = {0};
+    uint8_t seen_boxes[9][10] = {0};
+
+    for (int r = 0; r < 9; r++) {
+        for (int c = 0; c < 9; c++) {
+            
+            uint8_t value = board->cells[r * 9 + c];
+
+            // 1. Check for Completeness and Valid Range
+            // A valid, solved board should *only* contain numbers 1-9.
+            if (value == 0 || value > 9) {
+                // printf("Validation Error: Cell (%d,%d) is empty or invalid.\n", r, c);
+                return 0; // Invalid: Solution is incomplete or corrupt
+            }
+
+            // 2. Check Row
+            if (seen_rows[r][value]) {
+                // printf("Validation Error: Duplicate %u in row %d.\n", value, r);
+                return 0; // Invalid: Duplicate in row
+            }
+            seen_rows[r][value] = 1;
+
+            // 3. Check Column
+            if (seen_cols[c][value]) {
+                // printf("Validation Error: Duplicate %u in col %d.\n", value, c);
+                return 0; // Invalid: Duplicate in column
+            }
+            seen_cols[c][value] = 1;
+
+            // 4. Check Box
+            int box_idx = (r / 3) * 3 + (c / 3);
+            if (seen_boxes[box_idx][value]) {
+                // printf("Validation Error: Duplicate %u in box %d.\n", value, box_idx);
+                return 0; // Invalid: Duplicate in box
+            }
+            seen_boxes[box_idx][value] = 1;
+        }
+    }
+
+    // If we looped through all 81 cells and found no errors,
+    // the solution is valid and complete.
+    return 1; // Valid
+}
+
+int is_board_valid(const struct Board* board) {
+
+    // seen_rows[r][num] == 1 means that the number 'num' has been spotten on the row 'r'
+    uint8_t seen_rows[9][10] = {0};
+    uint8_t seen_cols[9][10] = {0};
+    uint8_t seen_boxes[9][10] = {0};
+
+    for (int r = 0; r < 9; r++) {
+        for (int c = 0; c < 9; c++) {
+            
+            uint8_t value = board->cells[r * 9 + c];
+
+            // Ignore the empty cells
+            if (value == 0) {
+                continue;
+            }
+
+            // Check the row
+            if (seen_rows[r][value]) {
+                return 0; // Invalid: Duplicate in this row
+            }
+            seen_rows[r][value] = 1; // Mark it as "seen"
+
+            // Check the column
+            if (seen_cols[c][value]) {
+                return 0; // Invalid: Duplicate in this column 
+            }
+            seen_cols[c][value] = 1;  // Mark it as "seen"
+
+            // Check the 3x3 grid
+            int box_idx = (r / 3) * 3 + (c / 3);
+            if (seen_boxes[box_idx][value]) {
+                return 0; // Invalid: Duplicate in this grid 
+            }
+            seen_boxes[box_idx][value] = 1;  // Mark it as "seen"
+        }
+    }
+
+    return 1; // Valid if we reach this point
 }
