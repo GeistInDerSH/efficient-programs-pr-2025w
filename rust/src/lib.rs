@@ -141,6 +141,7 @@ impl Debug for Board {
 /// between Rust strings and C-Strings.
 #[allow(unused)]
 #[inline(always)]
+#[cfg(all(feature = "raw_syscalls", target_arch = "x86_64", target_os = "linux"))]
 fn x64_linux_syscall(syscall_id: u64, rdi: u64, rsi: u64, rdx: u64) -> i64 {
     let ret: i64;
     unsafe {
@@ -159,6 +160,7 @@ fn x64_linux_syscall(syscall_id: u64, rdi: u64, rsi: u64, rdx: u64) -> i64 {
 
 #[allow(unused)]
 #[inline(always)]
+#[cfg(all(feature = "raw_syscalls", target_arch = "x86_64", target_os = "linux"))]
 fn read_to_buffer(filename: &str) -> io::Result<[u8; 89]> {
     // Syscall ID and expected register value information pulled from:
     // https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/
@@ -199,11 +201,7 @@ fn read_to_buffer(filename: &str) -> io::Result<[u8; 89]> {
 /// * The file is smaller than 89 bytes
 /// * Data in the file is not digits 0 to 9
 pub fn read_file(filename: &str) -> io::Result<Board> {
-    #[cfg(all(
-        not(feature = "raw_syscalls"),
-        target_os = "linux",
-        target_arch = "x86_64"
-    ))]
+    #[cfg(not(all(feature = "raw_syscalls", target_os = "linux", target_arch = "x86_64")))]
     let data = {
         let mut file = std::fs::File::open(filename)?;
 
