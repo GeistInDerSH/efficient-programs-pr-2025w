@@ -1,7 +1,12 @@
 use crate::{Board, Solution};
 
-#[cfg(all(feature = "priority_queue", feature = "best_swap"))]
-compile_error!("The 'priority_queue' and 'best_swap' cannot be used together");
+#[cfg(all(
+    feature = "constraint_solve_full_sort",
+    feature = "constraint_solve_minimal_sort"
+))]
+compile_error!(
+    "The 'constraint_solve_full_sort' and 'constraint_solve_minimal_sort' cannot be used together"
+);
 
 /// All bits for the value have been seen
 const ALL_BITS_SET: u16 = 0b1_1111_1111;
@@ -67,7 +72,7 @@ impl Solver {
         // Sort so the cell with the least number of candidates is first. The idea
         // being we can solve the easy ones first, then it helps to eliminate options
         // for cells with more possibilities
-        #[cfg(feature = "priority_queue")]
+        #[cfg(feature = "constraint_solve_full_sort")]
         self.todo[index..].sort_by(|&a, &b| {
             let a_count = {
                 let (row, col, box_num) = a;
@@ -80,7 +85,7 @@ impl Solver {
 
             a_count.cmp(&b_count)
         });
-        #[cfg(feature = "best_swap")]
+        #[cfg(feature = "constraint_solve_minimal_sort")]
         {
             let best = self.find_best_index(index);
             self.todo.swap(index, best);
@@ -114,7 +119,7 @@ impl Solver {
             // Sort so the cell with the least number of candidates is first. The idea
             // being we can solve the easy ones first, then it helps to eliminate options
             // for cells with more possibilities
-            #[cfg(feature = "priority_queue")]
+            #[cfg(feature = "constraint_solve_full_sort")]
             self.todo.get_unchecked_mut(index..).sort_by(|&a, &b| {
                 let a_count = {
                     let (row, col, box_num) = a;
@@ -133,7 +138,7 @@ impl Solver {
 
                 a_count.cmp(&b_count)
             });
-            #[cfg(feature = "best_swap")]
+            #[cfg(feature = "constraint_solve_minimal_sort")]
             {
                 let best = self.find_best_index(index);
                 self.todo.swap(index, best);

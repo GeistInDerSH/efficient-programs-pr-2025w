@@ -77,7 +77,7 @@ some loads and comparisons.
 
 This is a decent improvement over `src/bit_masking_v2`.
 
-#### Extension: `priority_queue`
+#### Extension: `constraint_solve_full_sort`
 
 Because we are storing the locations that still need to be solved,
 we can sort these in order from the fewest possible solutions to
@@ -87,8 +87,25 @@ on each recursive call.
 This helps to reduce the number of guesses the solver needs to make,
 and as a result backtrack less for faster solutions.
 
+This effectively turns the solving into a kind of constraint solver.
+
 This offers a decent improvement over the base `src/bit_masking_v3`,
 and a significant improvement over `src/bit_masking_v2`
+
+#### Extension: `constraint_solve_minimal_sort`
+
+`constraint_solve_full_sort` is a nice speedup, but it requires that
+we resort the full array on each sub-call. It would be more effective
+to find the best index, and then swap it with the current one. This
+has a similar worst case number of compares, but only changes the
+position of two elements.
+
+`constraint_solve_minimal_sort` and `constraint_solve_full_sort` are
+mutually exclusive, and a compiler error is thrown if an attempt
+to use both is made
+
+This is faster when compared to `constraint_solve_full_sort`, by a
+small amount.
 
 #### Extension: `unchecked_indexing`
 
