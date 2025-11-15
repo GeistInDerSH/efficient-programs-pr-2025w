@@ -1,5 +1,8 @@
 use crate::{Board, Solution};
 
+#[cfg(all(feature = "priority_queue", feature = "best_swap"))]
+compile_error!("The 'priority_queue' and 'best_swap' cannot be used together");
+
 /// All bits for the value have been seen
 const ALL_BITS_SET: u16 = 0b1_1111_1111;
 
@@ -17,6 +20,48 @@ struct Solver {
 }
 
 impl Solver {
+    #[allow(unused)]
+    #[inline(always)]
+    fn find_best_index(&self, start: usize) -> usize {
+        let mut best = start;
+        let mut i = start;
+        let mut best_count = !0;
+        while i < self.todo.len() {
+            let (row, col, box_num) = {
+                #[cfg(not(feature = "unchecked_indexing"))]
+                {
+                    self.todo[i]
+                }
+                #[cfg(feature = "unchecked_indexing")]
+                unsafe {
+                    *self.todo.get_unchecked(i)
+                }
+            };
+            let count = {
+                #[cfg(not(feature = "unchecked_indexing"))]
+                {
+                    (self.rows[row] & self.cols[col] & self.boxes[box_num]).count_ones()
+                }
+                #[cfg(feature = "unchecked_indexing")]
+                unsafe {
+                    (self.rows.get_unchecked(row)
+                        & self.cols.get_unchecked(col)
+                        & self.boxes.get_unchecked(box_num))
+                    .count_ones()
+                }
+            };
+            if count < best_count {
+                best = i;
+                best_count = count;
+                if best_count <= 1 {
+                    break;
+                }
+            }
+            i += 1;
+        }
+        best
+    }
+
     #[cfg(not(feature = "unchecked_indexing"))]
     fn solve(&mut self, index: usize) -> bool {
         // Sort so the cell with the least number of candidates is first. The idea
@@ -35,6 +80,11 @@ impl Solver {
 
             a_count.cmp(&b_count)
         });
+        #[cfg(feature = "best_swap")]
+        {
+            let best = self.find_best_index(index);
+            self.todo.swap(index, best);
+        }
 
         let (row, col, box_num) = self.todo[index];
 
@@ -83,6 +133,11 @@ impl Solver {
 
                 a_count.cmp(&b_count)
             });
+            #[cfg(feature = "best_swap")]
+            {
+                let best = self.find_best_index(index);
+                self.todo.swap(index, best);
+            }
 
             let (row, col, box_num) = *self.todo.get_unchecked(index);
 

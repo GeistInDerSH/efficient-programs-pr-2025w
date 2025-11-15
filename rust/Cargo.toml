@@ -16,6 +16,7 @@ solve_bitset_masking_v1 = []
 measure_runtime = []
 priority_queue = []
 unchecked_indexing = []
+best_swap = []
 
 [dev-dependencies]
 criterion = "0.7.0"
