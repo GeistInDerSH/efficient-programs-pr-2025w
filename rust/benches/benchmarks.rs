@@ -92,6 +92,37 @@ fn print_boards(c: &mut Criterion) {
     });
 }
 
+fn full_runs(c: &mut Criterion) {
+    let file_names = [
+        ("easy", "../boards/solvable-easy-1.sudoku"),
+        ("medium", "../boards/solvable-medium-1.sudoku"),
+        ("hard", "../boards/solvable-hard-1.sudoku"),
+        ("extra hard", "../boards/solvable-extra-hard-1.sudoku"),
+        ("2x hard", "../boards/solvable-2x-hard.sudoku"),
+        ("fully solved", "../boards/fully-solved.sudoku"),
+    ];
+
+    for (name, file_path) in &file_names {
+        c.bench_function(&format!("full ({name})"), |b| {
+            b.iter(|| {
+                let board = sudoku_solver::read_file(file_path).unwrap();
+                let solution = board.solve();
+                let _ = std::hint::black_box(match solution {
+                    Some(solution) => format!("{solution}"),
+                    None => "No solution".to_string(),
+                });
+            })
+        });
+        c.bench_function(&format!("full no display ({name})"), |b| {
+            b.iter(|| {
+                let board = sudoku_solver::read_file(file_path).unwrap();
+                let _ = std::hint::black_box(board.solve());
+            })
+        });
+    }
+}
+
 criterion_group!(io, file_io, print_boards);
 criterion_group!(boards, solvable_boards, invalid_boards);
-criterion_main!(io, boards);
+criterion_group!(full, full_runs);
+criterion_main!(io, boards, full);
