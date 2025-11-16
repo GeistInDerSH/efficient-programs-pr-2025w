@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate criterion;
 use criterion::Criterion;
-use sudoku_solver::SudokuSolver;
+use sudoku_solver::{example_boards, SudokuSolver};
 
 fn file_io(c: &mut Criterion) {
     c.bench_function("read_file exists", |b| {
@@ -13,87 +13,61 @@ fn file_io(c: &mut Criterion) {
 }
 
 fn invalid_boards(c: &mut Criterion) {
-    c.bench_function("invalid (multiple collisions)", |b| {
-        b.iter(|| sudoku_solver::example_boards::INVALID_BOARD_ROW_AND_COL_COLLISION.solve());
-    });
-    c.bench_function("invalid (row collisions)", |b| {
-        b.iter(|| sudoku_solver::example_boards::INVALID_BOARD_ROW_COLLISION.solve());
-    });
-    c.bench_function("invalid (col collisions)", |b| {
-        b.iter(|| sudoku_solver::example_boards::INVALID_BOARD_COL_COLLISION.solve());
-    });
-    c.bench_function("invalid (box collisions)", |b| {
-        b.iter(|| sudoku_solver::example_boards::INVALID_BOARD_BOX_COLLISION.solve());
-    });
+    let bench_table = [
+        (
+            "multiple",
+            example_boards::INVALID_BOARD_ROW_AND_COL_COLLISION,
+        ),
+        ("row", example_boards::INVALID_BOARD_ROW_COLLISION),
+        ("col", example_boards::INVALID_BOARD_COL_COLLISION),
+        ("box", example_boards::INVALID_BOARD_BOX_COLLISION),
+    ];
+    for (name, board) in &bench_table {
+        c.bench_function(&format!("invalid ({name} collisions)"), |b| {
+            b.iter(|| board.solve());
+        });
+    }
 }
 
 fn solvable_boards(c: &mut Criterion) {
-    c.bench_function("solvable (easy)", |b| {
-        b.iter(|| sudoku_solver::example_boards::EASY_BOARD.solve());
-    });
-    c.bench_function("solvable (medium)", |b| {
-        b.iter(|| sudoku_solver::example_boards::MEDIUM_BOARD.solve());
-    });
-    c.bench_function("solvable (hard)", |b| {
-        b.iter(|| sudoku_solver::example_boards::HARD_BOARD.solve());
-    });
-    c.bench_function("solvable (extra hard)", |b| {
-        b.iter(|| sudoku_solver::example_boards::EXTRA_HARD_BOARD.solve());
-    });
-    c.bench_function("solvable (2x hard)", |b| {
-        b.iter(|| sudoku_solver::example_boards::HARD_2X_BOARD.solve());
-    });
-    c.bench_function("solvable (solved)", |b| {
-        b.iter(|| sudoku_solver::example_boards::SOLVED_BOARD.solve());
-    });
+    let bench_table = [
+        ("easy", example_boards::EASY_BOARD),
+        ("medium", example_boards::MEDIUM_BOARD),
+        ("hard", example_boards::HARD_BOARD),
+        ("extra hard", example_boards::EXTRA_HARD_BOARD),
+        ("2x hard", example_boards::HARD_2X_BOARD),
+        ("fully solved", example_boards::SOLVED_BOARD),
+    ];
+
+    for (name, board) in &bench_table {
+        c.bench_function(&format!("solvable ({name})"), |b| {
+            b.iter(|| board.solve());
+        });
+    }
 }
 
 fn print_boards(c: &mut Criterion) {
-    c.bench_function("print (easy)", |b| {
-        let solution = sudoku_solver::example_boards::EASY_BOARD.solve().unwrap();
-        b.iter(|| {
-            let _ = std::hint::black_box(format!("{solution}"));
-        });
-    });
-    c.bench_function("print (medium)", |b| {
-        let solution = sudoku_solver::example_boards::MEDIUM_BOARD.solve().unwrap();
-        b.iter(|| {
-            let _ = std::hint::black_box(format!("{solution}"));
-        });
-    });
-    c.bench_function("print (hard)", |b| {
-        let solution = sudoku_solver::example_boards::HARD_BOARD.solve().unwrap();
+    let bench_table = [
+        ("easy", example_boards::EASY_BOARD),
+        ("medium", example_boards::MEDIUM_BOARD),
+        ("hard", example_boards::HARD_BOARD),
+        ("extra hard", example_boards::EXTRA_HARD_BOARD),
+        ("2x hard", example_boards::HARD_2X_BOARD),
+        ("fully solved", example_boards::SOLVED_BOARD),
+    ];
 
-        b.iter(|| {
-            let _ = std::hint::black_box(format!("{solution}"));
+    for (name, board) in &bench_table {
+        c.bench_function(&format!("print ({name})"), |b| {
+            let solution = board.solve().unwrap();
+            b.iter(|| {
+                let _ = std::hint::black_box(format!("{solution}"));
+            });
         });
-    });
-    c.bench_function("print (extra hard)", |b| {
-        let solution = sudoku_solver::example_boards::EXTRA_HARD_BOARD
-            .solve()
-            .unwrap();
-        b.iter(|| {
-            let _ = std::hint::black_box(format!("{solution}"));
-        });
-    });
-    c.bench_function("print solution (2x hard)", |b| {
-        let solution = sudoku_solver::example_boards::HARD_2X_BOARD
-            .solve()
-            .unwrap();
-        b.iter(|| {
-            let _ = std::hint::black_box(format!("{solution}"));
-        });
-    });
-    c.bench_function("print solution (solved)", |b| {
-        let solution = sudoku_solver::example_boards::SOLVED_BOARD.solve().unwrap();
-        b.iter(|| {
-            let _ = std::hint::black_box(format!("{solution}"));
-        });
-    });
+    }
 }
 
 fn full_runs(c: &mut Criterion) {
-    let file_names = [
+    let bench_table = [
         ("easy", "../boards/solvable-easy-1.sudoku"),
         ("medium", "../boards/solvable-medium-1.sudoku"),
         ("hard", "../boards/solvable-hard-1.sudoku"),
@@ -102,7 +76,7 @@ fn full_runs(c: &mut Criterion) {
         ("fully solved", "../boards/fully-solved.sudoku"),
     ];
 
-    for (name, file_path) in &file_names {
+    for (name, file_path) in &bench_table {
         c.bench_function(&format!("full ({name})"), |b| {
             b.iter(|| {
                 let board = sudoku_solver::read_file(file_path).unwrap();
