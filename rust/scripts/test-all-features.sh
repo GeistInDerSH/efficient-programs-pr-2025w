@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FEATURES=$(sed -nE 's/(solve_[a-zA-Z_0-9]*) ?= ?\[.*\]/\1/p' Cargo.toml)
+FEATURES=$(sed -nE 's/(^solve_[a-zA-Z_0-9]*) ?= ?\[.*\]/\1/p' Cargo.toml)
 TEST_FAILURES=()
 
 echo "[INFO] Running all tests for all features individually:"
