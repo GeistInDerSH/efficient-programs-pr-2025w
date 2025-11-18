@@ -1,15 +1,25 @@
 #[macro_use]
 extern crate criterion;
+
 use criterion::Criterion;
+use std::time::Duration;
 use sudoku_solver::{example_boards, SudokuSolver};
 
 fn file_io(c: &mut Criterion) {
-    c.bench_function("read_file exists", |b| {
+    let mut group = c.benchmark_group("file_io");
+    group
+        .sample_size(1000)
+        .warm_up_time(Duration::from_secs(5))
+        .measurement_time(Duration::from_secs(10));
+
+    group.bench_function("read_file exists", |b| {
         b.iter(|| sudoku_solver::read_file("../boards/example-1.sudoku"))
     });
-    c.bench_function("read_file dne", |b| {
+    group.bench_function("read_file dne", |b| {
         b.iter(|| sudoku_solver::read_file("invalid/file.sudoku"))
     });
+
+    group.finish();
 }
 
 fn invalid_boards(c: &mut Criterion) {
@@ -22,11 +32,19 @@ fn invalid_boards(c: &mut Criterion) {
         ("col", example_boards::INVALID_BOARD_COL_COLLISION),
         ("box", example_boards::INVALID_BOARD_BOX_COLLISION),
     ];
+
+    let mut group = c.benchmark_group("invalid");
+    group
+        .sample_size(1000)
+        .measurement_time(Duration::from_secs(10))
+        .warm_up_time(Duration::from_secs(5));
+
     for (name, board) in &bench_table {
-        c.bench_function(&format!("invalid ({name} collisions)"), |b| {
+        group.bench_function(format!("{name} collisions"), |b| {
             b.iter(|| board.solve());
         });
     }
+    group.finish();
 }
 
 fn solvable_boards(c: &mut Criterion) {
@@ -39,31 +57,34 @@ fn solvable_boards(c: &mut Criterion) {
         ("fully solved", example_boards::SOLVED_BOARD),
     ];
 
+    let mut group = c.benchmark_group("solvable");
+    group
+        .sample_size(1000)
+        .warm_up_time(Duration::from_secs(5))
+        .measurement_time(Duration::from_secs(10));
+
     for (name, board) in &bench_table {
-        c.bench_function(&format!("solvable ({name})"), |b| {
+        group.bench_function(*name, |b| {
             b.iter(|| board.solve());
         });
     }
+
+    group.finish();
 }
 
 fn print_boards(c: &mut Criterion) {
-    let bench_table = [
-        ("easy", example_boards::EASY_BOARD),
-        ("medium", example_boards::MEDIUM_BOARD),
-        ("hard", example_boards::HARD_BOARD),
-        ("extra hard", example_boards::EXTRA_HARD_BOARD),
-        ("2x hard", example_boards::HARD_2X_BOARD),
-        ("fully solved", example_boards::SOLVED_BOARD),
-    ];
+    let mut group = c.benchmark_group("display");
+    group.sample_size(1000);
 
-    for (name, board) in &bench_table {
-        c.bench_function(&format!("print ({name})"), |b| {
-            let solution = board.solve().unwrap();
-            b.iter(|| {
-                let _ = std::hint::black_box(format!("{solution}"));
-            });
-        });
-    }
+    group.bench_function("solved", |b| {
+        let solution = example_boards::SOLVED_BOARD.solve().unwrap();
+        b.iter(|| solution.to_string());
+    });
+    group.bench_function("unsolved", |b| {
+        let board = example_boards::EASY_BOARD;
+        b.iter(|| board.to_string());
+    });
+    group.finish()
 }
 
 fn full_runs(c: &mut Criterion) {
@@ -76,24 +97,25 @@ fn full_runs(c: &mut Criterion) {
         ("fully solved", "../boards/fully-solved.sudoku"),
     ];
 
+    let mut group = c.benchmark_group("full runs");
+    group
+        .sample_size(5000)
+        .warm_up_time(Duration::from_secs(5))
+        .measurement_time(Duration::from_secs(15));
+
     for (name, file_path) in &bench_table {
-        c.bench_function(&format!("full ({name})"), |b| {
+        group.bench_function(*name, |b| {
             b.iter(|| {
                 let board = sudoku_solver::read_file(file_path).unwrap();
                 let solution = board.solve();
                 let _ = std::hint::black_box(match solution {
-                    Some(solution) => format!("{solution}"),
+                    Some(solution) => format!("Solution:\n{solution}"),
                     None => "No solution".to_string(),
                 });
             })
         });
-        c.bench_function(&format!("full no display ({name})"), |b| {
-            b.iter(|| {
-                let board = sudoku_solver::read_file(file_path).unwrap();
-                let _ = std::hint::black_box(board.solve());
-            })
-        });
     }
+    group.finish();
 }
 
 criterion_group!(io, file_io, print_boards);
