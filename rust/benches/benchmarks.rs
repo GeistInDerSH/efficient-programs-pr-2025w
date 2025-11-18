@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate criterion;
 
-use criterion::Criterion;
+use criterion::{BenchmarkId, Criterion};
 use std::time::Duration;
 use sudoku_solver::{example_boards, SudokuSolver};
 
@@ -104,16 +104,20 @@ fn full_runs(c: &mut Criterion) {
         .measurement_time(Duration::from_secs(15));
 
     for (name, file_path) in &bench_table {
-        group.bench_function(*name, |b| {
-            b.iter(|| {
-                let board = sudoku_solver::read_file(file_path).unwrap();
-                let solution = board.solve();
-                let _ = std::hint::black_box(match solution {
-                    Some(solution) => format!("Solution:\n{solution}"),
-                    None => "No solution".to_string(),
+        group.bench_with_input(
+            BenchmarkId::new("full run", *name),
+            file_path,
+            |b, file_path| {
+                b.iter(|| {
+                    let board = sudoku_solver::read_file(file_path).unwrap();
+                    let solution = board.solve();
+                    let _ = std::hint::black_box(match solution {
+                        Some(solution) => format!("Solution:\n{solution}"),
+                        None => "No solution".to_string(),
+                    });
                 });
-            })
-        });
+            },
+        );
     }
     group.finish();
 }
