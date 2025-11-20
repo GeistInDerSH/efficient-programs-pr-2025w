@@ -401,6 +401,35 @@ pub mod example_boards {
 mod tests {
     use super::*;
     use crate::SudokuSolver;
+    use std::collections::HashSet;
+
+    fn is_valid_solution(solved_board: &Solution) -> bool {
+        let mut rows = vec![HashSet::new(); 9];
+        let mut cols = vec![HashSet::new(); 9];
+        let mut boxes = vec![HashSet::new(); 9];
+
+        for row in 0..9 {
+            for col in 0..9 {
+                let value = solved_board[(row, col)];
+                let box_number = (row / 3) * 3 + (col / 3);
+                if !rows[row].insert(value)
+                    || !cols[col].insert(value)
+                    || !boxes[box_number].insert(value)
+                {
+                    return false;
+                }
+            }
+        }
+
+        let expected = HashSet::from([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        for i in 0..9 {
+            if expected != rows[i] || expected != cols[i] || expected != boxes[i] {
+                return false;
+            }
+        }
+
+        true
+    }
 
     #[test]
     fn test_is_valid() {
@@ -417,6 +446,7 @@ mod tests {
         let board = example_boards::EASY_BOARD;
         let solution = board.solve();
         assert!(solution.is_some());
+        assert!(is_valid_solution(&solution.unwrap()));
     }
 
     #[test]
@@ -424,6 +454,7 @@ mod tests {
         let board = example_boards::MEDIUM_BOARD;
         let solution = board.solve();
         assert!(solution.is_some());
+        assert!(is_valid_solution(&solution.unwrap()));
     }
 
     #[test]
@@ -431,6 +462,7 @@ mod tests {
         let board = example_boards::HARD_BOARD;
         let solution = board.solve();
         assert!(solution.is_some());
+        assert!(is_valid_solution(&solution.unwrap()));
     }
 
     #[test]
@@ -438,6 +470,7 @@ mod tests {
         let board = example_boards::EXTRA_HARD_BOARD;
         let solution = board.solve();
         assert!(solution.is_some());
+        assert!(is_valid_solution(&solution.unwrap()));
     }
 
     #[test]
@@ -445,6 +478,7 @@ mod tests {
         let board = example_boards::HARD_2X_BOARD;
         let solution = board.solve();
         assert!(solution.is_some());
+        assert!(is_valid_solution(&solution.unwrap()));
     }
 
     #[test]
