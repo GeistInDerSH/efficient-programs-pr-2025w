@@ -9,6 +9,7 @@ use std::ops::Div;
 /// Additionally, track which bits have already been set in the grid by using three
 /// arrays of 9 u16s. This allows us to set the nth bit to indicate that the number has
 /// already been set in the row/column/box.
+#[cfg(not(feature = "skip_intermediate_stack_frames"))]
 fn solve(
     solution_grid: &mut Board,
     row_bits: &mut [u16; 9],
@@ -52,6 +53,64 @@ fn solve(
 
         false
     }
+}
+
+/// Attempt to solve the sudoku grid by recursively calling [`solve`] to use backtracking.
+/// Additionally, track which bits have already been set in the grid by using three
+/// arrays of 9 u16s. This allows us to set the nth bit to indicate that the number has
+/// already been set in the row/column/box.
+///
+/// Unlike the default version, this version will attempt to skip any  intermediate stack
+/// frames by generating the next row/column to check.
+#[cfg(feature = "skip_intermediate_stack_frames")]
+fn solve(
+    grid: &mut Board,
+    rows: &mut [u16; 9],
+    cols: &mut [u16; 9],
+    boxes: &mut [u16; 9],
+    row: usize,
+    col: usize,
+) -> bool {
+    if row == 9 {
+        return true;
+    }
+
+    let (next_row, next_col) = if col + 1 > 8 {
+        (row + 1, 0)
+    } else {
+        (row, col + 1)
+    };
+
+    if grid[(row, col)] != 0 {
+        return solve(grid, rows, cols, boxes, next_row, next_col);
+    }
+
+    let box_number = row.div(3) * 3 + col.div(3);
+    for p in 1..=9 {
+        let mask = 1 << (p - 1);
+
+        if (rows[row] & mask) | (cols[col] & mask) | (boxes[box_number] & mask) != 0 {
+            continue;
+        }
+
+        // Set the values in the grid, and bitmask fields
+        grid[(row, col)] = p;
+        rows[row] |= mask;
+        cols[col] |= mask;
+        boxes[box_number] |= mask;
+
+        if solve(grid, rows, cols, boxes, next_row, next_col) {
+            return true;
+        }
+
+        // Not a solution, so rollback the above masking
+        grid[(row, col)] = 0;
+        rows[row] &= !mask;
+        cols[col] &= !mask;
+        boxes[box_number] &= !mask;
+    }
+
+    false
 }
 
 impl super::SudokuSolver for Board {

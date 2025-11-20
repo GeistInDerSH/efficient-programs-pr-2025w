@@ -45,6 +45,15 @@ is rolled into the setup code, and avoids needing extra data structures.
 This ended up being a considerable improvement on the `src/basic_std_index`
 version.
 
+#### Extension: `skip_intermediate_stack_frames`
+
+As was noted via reading through the C implementation of this version,
+we can attempt to speed up the program by calculating what the next
+row and column will be before recurring into the solve function. This
+helps avoid extra stack frames where these values are only incremented.
+
+This offers a small performance boost.
+
 ### `src/bitset_masking_v1`
 
 The whole of a sudoku board can be stored into a single `u128`.
@@ -62,6 +71,15 @@ them are invalid, we can delay checking each of them by using bitwise
 and & or operations then checking if the result is non-zero.
 
 This offers a moderate improvement over the version in `src/bit_masking_v1`.
+
+#### Extension: `skip_intermediate_stack_frames`
+
+As was noted via reading through the C implementation of this version,
+we can attempt to speed up the program by calculating what the next
+row and column will be before recurring into the solve function. This
+helps avoid extra stack frames where these values are only incremented.
+
+This offers a small performance boost.
 
 ### `src/bit_masking_v3`
 
