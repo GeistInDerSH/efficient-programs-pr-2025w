@@ -87,7 +87,7 @@ fn solve(
 
     let box_number = row.div(3) * 3 + col.div(3);
     for p in 1..=9 {
-        let mask = 1 << (p - 1);
+        let mask = 1 << p;
 
         if (rows[row] & mask) | (cols[col] & mask) | (boxes[box_number] & mask) != 0 {
             continue;
