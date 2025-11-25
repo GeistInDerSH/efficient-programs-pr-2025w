@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [features]
-default = ["solve_bit_masking_v3_cs_min_ui"]
+default = ["solve_bit_masking_v4"]
 solve_basic = []
 solve_basic_std_index = []
 solve_bit_masking_v1 = []
@@ -16,6 +16,8 @@ solve_bit_masking_v3_cs_full = ["solve_bit_masking_v3", "constraint_solve_full_s
 solve_bit_masking_v3_cs_full_ui = ["solve_bit_masking_v3", "constraint_solve_full_sort", "unchecked_indexing"]
 solve_bit_masking_v3_cs_min = ["solve_bit_masking_v3", "constraint_solve_minimal_sort"]
 solve_bit_masking_v3_cs_min_ui = ["solve_bit_masking_v3", "constraint_solve_minimal_sort", "unchecked_indexing"]
+solve_bit_masking_v4 = []
+solve_bit_masking_v4_ui = ["solve_bit_masking_v4", "unchecked_indexing"]
 solve_bitset_masking_v1 = []
 measure_runtime = []
 unchecked_indexing = []

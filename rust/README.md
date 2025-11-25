@@ -125,6 +125,21 @@ to use both is made
 This is faster when compared to `constraint_solve_full_sort`, by a
 small amount.
 
+### `src/bit_masking_v4`
+
+This is largely very similar to `src/bit_masking_v3` with the
+`constraint_solve_minimal_sort` feature enabled but with several
+key improvements.
+
+1) Avoid needing to decrement the value when validating the board
+2) Use `u16::wrapping_neg` over `0 - u16`
+3) Model the different states for validating an incoming board (solved, unsolved, unsolvable)
+    1) As part of this, some struct construction can be delayed in some cases
+4) Re-order some data load instructions to make better use of caching
+
+In addition to those, the code using safe and unsafe Rust are split into
+two modules that cannot be mutually imported.
+
 ## Global Extensions
 
 ### `measure_runtime`
