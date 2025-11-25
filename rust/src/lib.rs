@@ -14,6 +14,8 @@ pub mod bit_masking_v1;
 pub mod bit_masking_v2;
 #[cfg(feature = "solve_bit_masking_v3")]
 pub mod bit_masking_v3;
+#[cfg(feature = "solve_bit_masking_v4")]
+pub mod bit_masking_v4;
 #[cfg(feature = "solve_bitset_masking_v1")]
 pub mod bitset_masking_v1;
 
@@ -110,6 +112,21 @@ impl Index<(usize, usize)> for Board {
     }
 }
 
+impl Index<usize> for Board {
+    type Output = u8;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        #[cfg(not(feature = "unchecked_indexing"))]
+        {
+            &self.0[index]
+        }
+        #[cfg(feature = "unchecked_indexing")]
+        unsafe {
+            self.0.get_unchecked(index)
+        }
+    }
+}
+
 /// Add support for (row, col) indexing to make it easier to work with the Board, and
 /// mutating the value at the index.
 impl IndexMut<(usize, usize)> for Board {
@@ -121,6 +138,19 @@ impl IndexMut<(usize, usize)> for Board {
         #[cfg(feature = "unchecked_indexing")]
         unsafe {
             self.0.get_unchecked_mut(index.0 * 9 + index.1)
+        }
+    }
+}
+
+impl IndexMut<usize> for Board {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        #[cfg(not(feature = "unchecked_indexing"))]
+        {
+            &mut self.0[index]
+        }
+        #[cfg(feature = "unchecked_indexing")]
+        unsafe {
+            self.0.get_unchecked_mut(index)
         }
     }
 }
