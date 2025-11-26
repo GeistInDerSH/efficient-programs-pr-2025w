@@ -45,7 +45,7 @@ impl From<&Board> for Status {
         let mut rows = [ALL_BITS_SET; 9];
         let mut cols = [ALL_BITS_SET; 9];
         let mut boxes = [ALL_BITS_SET; 9];
-        let mut todo = Vec::with_capacity(65);
+        let mut todo = Vec::with_capacity(81);
 
         for row in 0..9 {
             for col in 0..9 {
