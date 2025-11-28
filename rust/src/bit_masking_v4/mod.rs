@@ -102,22 +102,6 @@ fn pos_to_value(pos: u16) -> u8 {
     pos.trailing_zeros() as u8
 }
 
-/// Count the number of 1s in the given [`u16`], and return it as a [`u16`].
-#[inline(always)]
-fn count_ones(value: u16) -> u16 {
-    #[cfg(target_arch = "x86_64")]
-    // AMD64 has a popcnt instruction that can do this for us.
-    // For some reason u16::count_ones(), which calls intrinsics::ctpop,
-    // doesn't do this for us
-    unsafe {
-        std::arch::x86_64::_popcnt32(value as i32) as u16
-    }
-    #[cfg(not(target_arch = "x86_64"))]
-    {
-        value.count_ones() as u16
-    }
-}
-
 impl crate::SudokuSolver for Board {
     fn solve(&self) -> Option<Solution> {
         match self.into() {

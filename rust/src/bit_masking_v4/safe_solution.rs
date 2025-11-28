@@ -1,5 +1,5 @@
 use crate::bit_masking_v4::{
-    clear_low_bit, count_ones, get_low_bit, pos_to_value, BoxEntry, ColEntry, RowEntry, Solver,
+    clear_low_bit, get_low_bit, pos_to_value, BoxEntry, ColEntry, RowEntry, Solver,
 };
 
 impl Solver {
@@ -11,7 +11,7 @@ impl Solver {
         while i < self.todo.len() {
             let (row, col, box_num) = self.todo[i];
             let mask = self.get_mask(row, col, box_num);
-            let count = count_ones(mask);
+            let count = mask.count_ones();
             if count < best_count {
                 best = i;
                 best_count = count;

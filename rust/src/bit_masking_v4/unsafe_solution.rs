@@ -3,7 +3,7 @@
 /// Generally, it's better to stick to the code that doesn't rely on `unsafe`, but it's
 /// interesting to see how much of a performance difference it does (or does not) make.
 use crate::bit_masking_v4::{
-    clear_low_bit, count_ones, get_low_bit, pos_to_value, BoxEntry, ColEntry, RowEntry, Solver,
+    clear_low_bit, get_low_bit, pos_to_value, BoxEntry, ColEntry, RowEntry, Solver,
 };
 
 
@@ -14,8 +14,8 @@ impl Solver {
             let mut best = start;
             let mut best_count = !0;
             for (i, &(row, col, box_num)) in self.todo.get_unchecked(start..).iter().enumerate() {
-                let and = self.get_mask(row, col, box_num);
-                let count = count_ones(and);
+                let mask = self.get_mask(row, col, box_num);
+                let count = mask.count_ones();
                 if count < best_count {
                     best = i;
                     best_count = count;
