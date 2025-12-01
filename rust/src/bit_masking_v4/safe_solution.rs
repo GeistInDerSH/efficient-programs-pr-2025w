@@ -38,6 +38,9 @@ impl Solver {
         let mut candidates = self.get_mask(row, col, box_num);
         while candidates != 0 {
             let candidate = get_low_bit(candidates);
+            if (candidates ^ candidate) != 0 {
+                self.guesses += 1;
+            }
             candidates = clear_low_bit(candidates);
             self.rows[row] ^= candidate;
             self.cols[col] ^= candidate;

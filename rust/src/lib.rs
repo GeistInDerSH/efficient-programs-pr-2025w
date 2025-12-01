@@ -1,3 +1,4 @@
+use std::ffi::c_char;
 use std::fmt::{Debug, Display, Write};
 use std::io;
 #[allow(unused)]
@@ -65,7 +66,7 @@ pub type Solution = Board;
 /// assert_eq!(board_1d, board_2d);
 /// ```
 #[derive(Copy, Clone, PartialEq)]
-pub struct Board([u8; 81]);
+pub struct Board(pub [u8; 81]);
 
 impl From<[u8; 81]> for Board {
     fn from(board: [u8; 81]) -> Self {
@@ -295,6 +296,26 @@ macro_rules! time_it {
         let duration = start.elapsed();
         (res, duration)
     }};
+}
+
+fn from_str_line(line: &str) -> io::Result<Board> {
+    let mut buffer = [0; 81];
+    for (b, i) in buffer.iter_mut().zip(line.as_bytes()) {
+        *b = match *i {
+            b'0'..=b'9' => *i - b'0',
+            b'.' | b'_' => 0,
+            _ => return Err(io::Error::new(io::ErrorKind::InvalidData, "Invalid input")),
+        }
+    }
+
+    Ok(buffer.into())
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn rust_solve_sudoku(input: *const c_char, _: usize) -> (usize, usize) {
+    let line = unsafe { std::ffi::CStr::from_ptr(input) };
+    let sudoku = from_str_line(line.to_str().unwrap()).unwrap();
+    bit_masking_v4::solve_with_guesses(&sudoku)
 }
 
 pub mod example_boards {

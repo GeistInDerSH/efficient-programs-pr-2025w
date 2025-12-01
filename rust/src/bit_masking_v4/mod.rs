@@ -31,6 +31,7 @@ struct Solver {
     cols: [u16; 9],
     boxes: [u16; 9],
     todo: Vec<TodoEntry>,
+    guesses: usize,
 }
 
 /// Model the possible states of parsing/validating the board.
@@ -78,6 +79,7 @@ impl From<&Board> for Status {
                 cols,
                 boxes,
                 todo,
+                guesses: 0,
             })
         }
     }
@@ -115,5 +117,19 @@ impl crate::SudokuSolver for Board {
             Status::Unsolvable => None,
             Status::Solved => Some(*self),
         }
+    }
+}
+
+pub fn solve_with_guesses(board: &Board) -> (usize, usize) {
+    match board.into() {
+        Status::Unsolved(mut solution) => {
+            if solution.solve(0) {
+                (1, solution.guesses)
+            } else {
+                (0, 0)
+            }
+        }
+        Status::Unsolvable => (0, 0),
+        Status::Solved => (1, 0),
     }
 }
