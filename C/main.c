@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
     Solution_CacheOptimized solution_cache_optimized;
     struct timespec start, end;
 
-    clock_gettime(CLOCK_MONOTONIC, &start);
+    timespec_get(&start, TIME_UTC);
 
     int found_solution;
     switch(optimization_index)
@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
 
     // int found_solution = solve_optimized_v0(&board, &solution);
 
-    clock_gettime(CLOCK_MONOTONIC, &end);
+    timespec_get(&end, TIME_UTC);
     // --- End time_it! equivalent ---
 
     long nanos = get_nanos(&start, &end);

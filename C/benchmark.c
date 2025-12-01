@@ -31,9 +31,9 @@ void benchmark_solver(const char* name, int iters, void (*func)(void*, struct Bo
     }
 
     for (int i = 0; i < iters; i++) {
-        clock_gettime(CLOCK_MONOTONIC, &start);
+        timespec_get(&start, TIME_UTC);
         func(context, b); // Call the function to benchmark
-        clock_gettime(CLOCK_MONOTONIC, &end);
+        timespec_get(&end, TIME_UTC);
         total_nanos += get_nanos(&start, &end);
     }
     printf("Solver Only - %s: %ld ns/iter\n", name, total_nanos / iters);
@@ -61,7 +61,7 @@ void bench_test(void* context, struct Board b) {
 
 void benchmark_full_run(const char* name, int iters, void (*func)(void*, struct Board), void* context, const char *filePath) {
     struct timespec start, end;
-    clock_gettime(CLOCK_MONOTONIC, &start);
+    timespec_get(&start, TIME_UTC);
 
     for (int i = 0; i < iters; i++) {
         struct Board b = {0};
@@ -74,7 +74,7 @@ void benchmark_full_run(const char* name, int iters, void (*func)(void*, struct 
         }
         func(context, b); // Call the function to benchmark
     }
-    clock_gettime(CLOCK_MONOTONIC, &end);
+    timespec_get(&end, TIME_UTC);
     long total_nanos = get_nanos(&start, &end);
     printf("Full Run    - %s: %ld ns/iter\n", name, total_nanos / iters);
 }
@@ -100,9 +100,9 @@ void benchmark_solver_cache_optimized(const char* name, int iters, void (*func)(
     }
 
     for (int i = 0; i < iters; i++) {
-        clock_gettime(CLOCK_MONOTONIC, &start);
+        timespec_get(&start, TIME_UTC);
         func(context, b); // Call the function to benchmark
-        clock_gettime(CLOCK_MONOTONIC, &end);
+        timespec_get(&end, TIME_UTC);
         total_nanos += get_nanos(&start, &end);
     }
     printf("Solver Only - %s: %ld ns/iter\n", name, total_nanos / iters);
@@ -110,7 +110,7 @@ void benchmark_solver_cache_optimized(const char* name, int iters, void (*func)(
 
 void benchmark_full_run_cache_optimized(const char* name, int iters, void (*func)(void*, struct Board_CacheOptimized), void* context, const char *filePath) {
     struct timespec start, end;
-    clock_gettime(CLOCK_MONOTONIC, &start);
+    timespec_get(&start, TIME_UTC);
 
 
     for (int i = 0; i < iters; i++) {
@@ -123,7 +123,7 @@ void benchmark_full_run_cache_optimized(const char* name, int iters, void (*func
         }
         func(context, b);
     }
-    clock_gettime(CLOCK_MONOTONIC, &end);
+    timespec_get(&end, TIME_UTC);
     long total_nanos = get_nanos(&start, &end);
     printf("Full Run    - %s: %ld ns/iter\n", name, total_nanos / iters);
 }
@@ -150,7 +150,7 @@ void bench_read_file_dne(const char *filePath) {
 }
 
 int main(void) {
-    const int ITERS = 1; // change this by need
+    const int ITERS = 100; // change this by need
     
 
     printf("************************ Unoptimized ************************ \n");
