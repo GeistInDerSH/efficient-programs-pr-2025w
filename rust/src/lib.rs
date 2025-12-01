@@ -83,6 +83,69 @@ impl From<[[u8; 9]; 9]> for Board {
     }
 }
 
+impl TryFrom<&[u8]> for Board {
+    type Error = &'static str;
+
+    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
+        match bytes.len() {
+            // The entire board is given as a 1d array of bytes. This is a shortcut
+            // because we can optimize away some checks for newlines and just do 81 cmps
+            81 => {
+                let mut buffer = [0; 81];
+                for (buff, value) in buffer.iter_mut().zip(bytes) {
+                    match value {
+                        b'0'..=b'9' => *buff = *value - b'0',
+                        b'.' | b'_' => *buff = 0,
+                        _ => return Err("Invalid input"),
+                    }
+                }
+
+                Ok(Board(buffer))
+            }
+            // For all other input grids, there could be more characters, e.g. newlines
+            // which need to be handled.
+            _ => {
+                let mut buffer = [0; 81];
+                let mut index = 0;
+                for i in bytes {
+                    match *i {
+                        b'0'..=b'9' => {
+                            #[cfg(not(feature = "unchecked_indexing"))]
+                            {
+                                buffer[index] = *i - b'0';
+                            }
+                            #[cfg(feature = "unchecked_indexing")]
+                            unsafe {
+                                *buffer.get_unchecked_mut(index) = *i - b'0';
+                            }
+                            index += 1;
+                        }
+                        b'.' | b'_' => {
+                            #[cfg(not(feature = "unchecked_indexing"))]
+                            {
+                                buffer[index] = 0;
+                            }
+                            #[cfg(feature = "unchecked_indexing")]
+                            unsafe {
+                                *buffer.get_unchecked_mut(index) = 0;
+                            }
+                            index += 1;
+                        }
+                        b'\n' => {}
+                        _ => return Err("Invalid input"),
+                    }
+                }
+
+                if index == 81 {
+                    Ok(Board(buffer))
+                } else {
+                    Err("Invalid input")
+                }
+            }
+        }
+    }
+}
+
 impl Display for Board {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for (i, v) in self.0.iter().enumerate() {
@@ -243,46 +306,9 @@ pub fn read_file(filename: &str) -> io::Result<Board> {
     #[cfg(all(feature = "raw_syscalls", target_arch = "x86_64", target_os = "linux"))]
     let data = read_to_buffer(filename)?;
 
-    // Copy bytes out of the string. Each line should be 10 bytes long, 9 digits and 1 new line.
-    // Because of the new line, we need to add a small correction when addressing into the 1d array
-    let mut buffer = [0; 81];
-    let mut index = 0;
-    for i in &data {
-        match *i {
-            b'0'..=b'9' => {
-                #[cfg(not(feature = "unchecked_indexing"))]
-                {
-                    buffer[index] = *i - b'0';
-                }
-                #[cfg(feature = "unchecked_indexing")]
-                unsafe {
-                    *buffer.get_unchecked_mut(index) = *i - b'0';
-                }
-                index += 1;
-            }
-            b'.' | b'_' => {
-                #[cfg(not(feature = "unchecked_indexing"))]
-                {
-                    buffer[index] = 0;
-                }
-                #[cfg(feature = "unchecked_indexing")]
-                unsafe {
-                    *buffer.get_unchecked_mut(index) = 0;
-                }
-                index += 1;
-            }
-            b'\n' => {}
-            _ => {
-                return Err(io::Error::new(io::ErrorKind::InvalidData, "Invalid input"));
-            }
-        }
-    }
-
-    if index == 81 {
-        Ok(buffer.into())
-    } else {
-        Err(io::Error::new(io::ErrorKind::InvalidData, "Invalid input"))
-    }
+    data.as_slice()
+        .try_into()
+        .map_err(|msg| io::Error::new(io::ErrorKind::InvalidData, msg))
 }
 
 /// This is a macro that evaluates an expression, i.e. the body, and returns the result
