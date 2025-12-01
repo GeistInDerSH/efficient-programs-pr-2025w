@@ -260,6 +260,17 @@ pub fn read_file(filename: &str) -> io::Result<Board> {
                 }
                 index += 1;
             }
+            b'.' | b'_' => {
+                #[cfg(not(feature = "unchecked_indexing"))]
+                {
+                    buffer[index] = 0;
+                }
+                #[cfg(feature = "unchecked_indexing")]
+                unsafe {
+                    *buffer.get_unchecked_mut(index) = 0;
+                }
+                index += 1;
+            }
             b'\n' => {}
             _ => {
                 return Err(io::Error::new(io::ErrorKind::InvalidData, "Invalid input"));
