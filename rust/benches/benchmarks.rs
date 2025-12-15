@@ -1,7 +1,9 @@
 #[macro_use]
 extern crate criterion;
 
+use criterion::{criterion_group, criterion_main};
 use criterion::{BenchmarkId, Criterion};
+use std::io::{BufRead, BufReader};
 use std::time::Duration;
 use sudoku_solver::{example_boards, SudokuSolver};
 
@@ -122,7 +124,45 @@ fn full_runs(c: &mut Criterion) {
     group.finish();
 }
 
+fn bulk_boards(c: &mut Criterion) {
+    let bench_table = [
+        ("easy", "extra_boards/easy.sudoku"),
+        ("medium", "extra_boards/medium.sudoku"),
+        ("hard", "extra_boards/hard.sudoku"),
+        ("extra hard", "extra_boards/extra_hard.sudoku"),
+        ("2x hard", "extra_boards/2x_hard.sudoku"),
+    ];
+
+    let mut group = c.benchmark_group("bulk boards");
+    group
+        .sample_size(1000)
+        .warm_up_time(Duration::from_secs(5))
+        .measurement_time(Duration::from_secs(15));
+
+    for (name, file_path) in &bench_table {
+        group.bench_function(*name, |b| {
+            let boards = {
+                let file = std::fs::File::open(file_path).unwrap();
+                let reader = BufReader::new(file);
+                reader
+                    .lines()
+                    .map_while(Result::ok)
+                    .flat_map(|line| sudoku_solver::Board::try_from(line.as_bytes()))
+                    .collect::<Vec<_>>()
+            };
+            let mut cycles = boards.iter().cycle();
+            b.iter(|| {
+                for board in cycles.by_ref().take(33) {
+                    std::hint::black_box(board.solve());
+                }
+            });
+        });
+    }
+
+    group.finish();
+}
+
 criterion_group!(io, file_io, print_boards);
-criterion_group!(boards, solvable_boards, invalid_boards);
+criterion_group!(boards, solvable_boards, invalid_boards, bulk_boards);
 criterion_group!(full, full_runs);
 criterion_main!(io, boards, full);
