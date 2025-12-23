@@ -1,17 +1,16 @@
 #include "sudoku_optimized_v0.h"
 
 static inline int is_valid(const struct Board* board, int row, int col, uint8_t value) {
-    const uint8_t* cells = board->cells;
     int row_offset = row * 9;
 
     // Check row
     for (int c = 0; c < 9; c++) {
-        if (cells[row_offset + c] == value) return 0;
+        if (board->cells[row_offset + c] == value) return 0;
     }
 
     // Check column
     for (int r = 0; r < 9; r++) {
-        if (cells[r * 9 + col] == value) return 0;
+        if (board->cells[r * 9 + col] == value) return 0;
     }
 
     // Check 3x3 box
@@ -21,7 +20,7 @@ static inline int is_valid(const struct Board* board, int row, int col, uint8_t 
     for (int r = 0; r < 3; r++) {
         int row_idx = (box_row_start + r) * 9;
         for (int c = 0; c < 3; c++) {
-            if (cells[row_idx + box_col_start + c] == value) return 0;
+            if (board->cells[row_idx + box_col_start + c] == value) return 0;
         }
     }
 
@@ -48,7 +47,7 @@ static int solve_recursive(struct Board* board, int row, int col) {
         }
         board->cells[row * 9 + col] = 0;
 
-        return 0;
+        // return 0;
     }
 
     return 0;

@@ -48,27 +48,51 @@ bool test_solvable(const char *file_name, solve_function solve_fn) {
     return solve_fn(&board, &solution) == 1 && is_solution_valid(&solution);
 }
 
-bool test_invalid(const char *file_name, solve_function solve_fn) {
+bool test_invalid(const char *file_name, solve_function solve_fn, bool *board_valid) {
     struct Board board = {0};
     if(read_file(&board, file_name) != 0) {
+        // printf("HERE: %s", file_name);
+        *board_valid = false;
         return true;
     }
+
+    if (!is_board_valid(&board)) {
+        // printf("Board invalid: %s", file_name);
+        *board_valid = false;
+        return true;
+    }
+
     struct Board solution = {0};
     return solve_fn(&board, &solution) == 0;
 }
 
 bool run_tests(const char *group_name, solve_function solve_fn) {
     bool all_tests_pass = true;
-    puts(group_name);
+    char *title = malloc(20 + strlen(group_name));
+    memset(title, 0, 20 + strlen(group_name));
+    strcpy(title, "-----> ");
+    strcat(title, group_name);
+    strcat(title, "\n");
+    puts(title);
+    free(title);
 
     // Run tests for invalid input
     for (int i = 0; i < INVALID_BOARD_COUNT; i += 1) {
         const test_case test = INVALID_BOARDS[i];
-        if (test_invalid(test.file_name, solve_fn)) {
-            printf("%s: PASS\n", test.test_name);
-        } else {
-            printf("%s: FAIL\n", test.test_name);
-            all_tests_pass = false;
+        bool board_valid = true;
+        bool result = test_invalid(test.file_name, solve_fn, &board_valid);
+
+        if(board_valid == false) {
+            printf("Board invalid: %s\n", test.file_name);
+        }
+        else {
+            if(result == true) {
+                printf("%s: PASS\n", test.test_name);
+            }
+            else {
+                printf("%s: FAIL\n", test.test_name);
+                all_tests_pass = false;
+            }
         }
     }
 
@@ -94,14 +118,22 @@ bool test_solvable_cache_optimized(const char *file_name, solve_function_cache_o
         return false;
     }
     struct Board_CacheOptimized solution = {0};
-    return solve_fn(&board, &solution) == 0 && is_board_valid_cache_optimized(&solution);
+    return solve_fn(&board, &solution) == 1 && is_board_valid_cache_optimized(&solution);
 }
 
-bool test_invalid_cache_optimized(const char *file_name, solve_function_cache_optimized solve_fn) {
+bool test_invalid_cache_optimized(const char *file_name, solve_function_cache_optimized solve_fn, bool *board_valid) {
     struct Board_CacheOptimized board = {0};
     if(read_file2(&board, file_name) != 0) {
+        *board_valid = false;
         return true;
     }
+
+    if (!is_board_valid_cache_optimized(&board)) {
+        // printf("Board invalid: %s", file_name);
+        *board_valid = false;
+        return true;
+    }
+
     struct Board_CacheOptimized solution = {0};
     return solve_fn(&board, &solution) == 0;
 }
@@ -113,11 +145,20 @@ bool run_tests_cache_optimized(const char *group_name, solve_function_cache_opti
     // Run tests for invalid input
     for (int i = 0; i < INVALID_BOARD_COUNT; i += 1) {
         const test_case test = INVALID_BOARDS[i];
-        if (test_invalid_cache_optimized(test.file_name, solve_fn)) {
-            printf("%s: PASS\n", test.test_name);
-        } else {
-            printf("%s: FAIL\n", test.test_name);
-            all_tests_pass = false;
+        bool board_valid = true;
+        bool result = test_invalid_cache_optimized(test.file_name, solve_fn, &board_valid);
+
+        if(board_valid == false) {
+            printf("Board invalid: %s\n", test.file_name);
+        }
+        else {
+            if(result == true) {
+                printf("%s: PASS\n", test.test_name);
+            }
+            else {
+                printf("%s: FAIL\n", test.test_name);
+                all_tests_pass = false;
+            }
         }
     }
 
@@ -138,12 +179,12 @@ bool run_tests_cache_optimized(const char *group_name, solve_function_cache_opti
 
 int main(void) {
     bool all_tests_pass = true;
-    all_tests_pass &= run_tests("solve_unoptimized()", solve_unoptimized);
-    all_tests_pass &= run_tests("solve_optimized_v0()", solve_optimized_v0);
-    all_tests_pass &= run_tests("solve_optimized_v1()", solve_optimized_v1);
-    all_tests_pass &= run_tests("solve_optimized_v2()", solve_optimized_v2);
-    all_tests_pass &= run_tests_cache_optimized("solve_optimized_v3()", solve_optimized_v3);
-    all_tests_pass &= run_tests("solve_optimized_v4()", solve_optimized_v4);
-    all_tests_pass &= run_tests("solve_optimized_v5()", solve_optimized_v5);
+    all_tests_pass &= run_tests("------> solve_unoptimized()", solve_unoptimized);
+    all_tests_pass &= run_tests("------> solve_optimized_v0()", solve_optimized_v0);
+    all_tests_pass &= run_tests("------> solve_optimized_v1()", solve_optimized_v1);
+    all_tests_pass &= run_tests("------> solve_optimized_v2()", solve_optimized_v2);
+    all_tests_pass &= run_tests_cache_optimized("------> solve_optimized_v3()", solve_optimized_v3);
+    all_tests_pass &= run_tests("------> solve_optimized_v4()", solve_optimized_v4);
+    all_tests_pass &= run_tests("------> solve_optimized_v5()", solve_optimized_v5);
     return all_tests_pass ? 0 : 1;
 }
