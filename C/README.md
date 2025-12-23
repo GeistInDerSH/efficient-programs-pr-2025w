@@ -5,19 +5,19 @@
 ---------> run "./sudoku_test" to test all the Sudoku versions with each Board from "../boards" (12 boards until now)
 For each program/optimized/unoptimized program, a report will be generated, similar with this:
 
------> solve_optimized_v1()
-Invalid Characters        : PASS/FAIL
-Invalid Box Collision     : PASS/FAIL
-Invalid Col Collision     : PASS/FAIL
-Invalid Row Col Collision : PASS/FAIL
-Invalid Row Collision     : PASS/FAIL
-Fully Solved              : PASS/FAIL
-Solvable 2x hard          : PASS/FAIL
-Solvable Easy 1           : PASS/FAIL
-Solvable example 1        : PASS/FAIL
-Solvable extra hard 1     : PASS/FAIL
-Solvable hard 1           : PASS/FAIL
-Solvable medium 1         : PASS/FAIL
+------> solve_optimized_v3()
+Board invalid: ../boards/invalid-characters.sudoku
+Board invalid: ../boards/invalid-box-collision.sudoku
+Board invalid: ../boards/invalid-col-collision.sudoku
+Board invalid: ../boards/invalid-row-col-collision.sudoku
+Board invalid: ../boards/invalid-row-collision.sudoku
+Fully Solved              : PASS
+Solvable 2x hard          : PASS
+Solvable Easy 1           : PASS
+Solvable example 1        : PASS
+Solvable extra hard 1     : PASS
+Solvable hard 1           : PASS
+Solvable medium 1         : PASS
 
 Each program run for each board must print "PASS".
 In total there are no_of_programs x no_of_boards program runs.
