@@ -37,28 +37,29 @@ static int solve_recursive_combined(struct Board* board, int row, int col) {
     if (row == 9) {
         return 1;
     } 
-    else if (col == 9) {
+
+    if (col == 9) {
         return solve_recursive_combined(board, row + 1, 0);
     } 
-    else if (board->cells[row * 9 + col] != 0) {
+
+    if (board->cells[row * 9 + col] != 0) {
         return solve_recursive_combined(board, row, col + 1);
     } 
-    else {
-        for (uint8_t p = 1; p <= 9; p++) {
-            
-            if (!is_valid_combined(board, row, col, p)) {
-                continue;
-            }
-            
-            board->cells[row * 9 + col] = p;
-            if (solve_recursive_combined(board, row, col + 1)) {
-                return 1;
-            }
-            board->cells[row * 9 + col] = 0;
+
+    for (uint8_t p = 1; p <= 9; p++) {
+
+        if (!is_valid_combined(board, row, col, p)) {
+            continue;
         }
 
-        return 0;
+        board->cells[row * 9 + col] = p;
+        if (solve_recursive_combined(board, row, col + 1)) {
+            return 1;
+        }
+        board->cells[row * 9 + col] = 0;
     }
+
+    return 0;
 }
 
 

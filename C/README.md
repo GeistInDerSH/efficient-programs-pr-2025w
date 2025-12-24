@@ -21,7 +21,7 @@ Solvable medium 1         : PASS
 
 Each program run for each board must print "PASS".
 In total there are no_of_programs x no_of_boards program runs.
-
+This way, the check the correctness of the implementations.
 
 ---------> run "./sudoku_bench" to see the benchmark for each of the above tests
 
@@ -86,23 +86,36 @@ Solution:
 Took 760μs
 george@george-PC:~/Desktop/efficient-programs-pr-2025w/C$ 
 
+********************* Sudoku explained *********************
 
+The board has the size 9 by 9 - 81 cells
+
+Rules:
+    Each of the digits 1-9 must occur exactly once in each row.
+    Each of the digits 1-9 must occur exactly once in each column.
+    Each of the digits 1-9 must occur exactly once in each of the 9, 3x3 sub-boxes of the grid.
+
+Zeros indicate blanks and must be filled with a number from 1 to 9.
 
 ********************* Unoptimized version *********************
 
-Solves the Sudoku puzzle using backtracking.
-This is the unoptimized version of the algorithm.
+
+The (unoptimized) and the default idea to solve Sudoku is by employing backtracking.
+Here, we recursively try to fill the empty cells with numbers from 1 to 9.
+For every cell that doesn't have yet a number, we place a number and then we check whether our decision was valid,
+meaning to check if that number is valid according to the above rules.
+If it is valid, we move to the next cell, otherwise, we backtrack and try another number.
+
+This process/algorithm continues untill all cells are filled or no solution exists.
+
+I wrote the function "int is_valid(const struct Board* board, int row, int col, uint8_t value)" in order to check
+if I will break Sudoku rules if I put the value from the variable "value" at the row "row" and the column "col".
 
 This algorithm has an exponential complexity
 
 O(9^(N*N)) - where N is the size of the grid
 
 Space complexity: O(81) = O(1)
-
-REference:
-https://www.geeksforgeeks.org/dsa/sudoku-backtracking-7/
-
-
 
 
 ********************* Optimized version 0 *********************
@@ -119,11 +132,13 @@ computation row * 9 and we replace it with row_offset instead
 
 ********************* Optimized version 1 (Combined loops) *********************
 
-The first two "for" loops were combined.
+Inside the "is_valid()" function, the first two for loops are combined.
 
 The overhead with the initialization, verification and the counter increment is reduced.
 
+Also, "board->cells" is stored as a pointer and used through this pointer:
 
+const uint8_t* cells = board->cells;
 
 
 ********************* Optimized version 2 (Bitmask) *********************
@@ -258,8 +273,21 @@ This works well because the data size is small an they will fit perfectly in the
 The Lookup Table is an elegant optimization which replaces math operations with fast memory access
 
 
+********************* Optimized version 6 (DLX / Algorithm X (Exact Cover)) *********************
 
+Instead of trying numbers and check the validity, this optimization converts Sudoku into an exact cover problem.
+We know that there are 324 constraints (columns):
 
+    81 cell constraints (each cell filled only once)
+    81 row-digit constraints
+    81 col-digit constraints
+    81 box-digit constraints
+
+Each possible placement (row, col, digit) is a candidate row in a 0/1 matrix (729 rows total).
+
+The solver picks a set of candidate rows that covers every constraint exactly once.
+
+Dancing Links (DLX) makes backtracking very fast because the operation of "undo" is just relinking nodes.
 
 
 

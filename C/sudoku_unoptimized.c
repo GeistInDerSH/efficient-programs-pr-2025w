@@ -36,26 +36,29 @@ static int solve_recursive_unoptimized(struct Board* board, int row, int col) {
     if (row == 9) {
         return 1; // true: All rows solved
     } 
-    else if (col == 9) {
+
+    if (col == 9) {
         return solve_recursive_unoptimized(board, row + 1, 0); // Move to next row
     } 
-    else if (board->cells[row * 9 + col] != 0) {
+
+    if (board->cells[row * 9 + col] != 0) {
         return solve_recursive_unoptimized(board, row, col + 1); // Skip filled cell
     } 
-    else {
-        // Try all numbers
-        for (uint8_t p = 1; p <= 9; p++) {
-            if (!is_valid_unoptimized(board, row, col, p)) {
-                continue;
-            }
-            board->cells[row * 9 + col] = p; // Make guess
-            if (solve_recursive_unoptimized(board, row, col + 1)) {
-                return 1; // Guess was correct
-            }
-            board->cells[row * 9 + col] = 0;
+
+    // Try all numbers
+    for (uint8_t p = 1; p <= 9; p++) {
+        if (!is_valid_unoptimized(board, row, col, p)) {
+            continue;
         }
-        return 0; // No valid number found
+        board->cells[row * 9 + col] = p; // Make guess
+        if (solve_recursive_unoptimized(board, row, col + 1)) {
+            return 1; // Guess was correct
+        }
+        board->cells[row * 9 + col] = 0;
     }
+
+    return 0; // No valid number found
+
 }
 
 int solve_unoptimized( struct Board* input, struct Board* solution) {
