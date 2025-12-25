@@ -273,24 +273,6 @@ This works well because the data size is small an they will fit perfectly in the
 The Lookup Table is an elegant optimization which replaces math operations with fast memory access
 
 
-********************* Optimized version 6 (DLX / Algorithm X (Exact Cover)) *********************
-
-Instead of trying numbers and check the validity, this optimization converts Sudoku into an exact cover problem.
-We know that there are 324 constraints (columns):
-
-    81 cell constraints (each cell filled only once)
-    81 row-digit constraints
-    81 col-digit constraints
-    81 box-digit constraints
-
-Each possible placement (row, col, digit) is a candidate row in a 0/1 matrix (729 rows total).
-
-The solver picks a set of candidate rows that covers every constraint exactly once.
-
-Dancing Links (DLX) makes backtracking very fast because the operation of "undo" is just relinking nodes.
-
-
-
 
 
 
