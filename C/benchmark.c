@@ -170,7 +170,7 @@ int main(void) {
     benchmark_runner("Solvable medium 1         ", ITERS, bench_test, (void*)solve_unoptimized, "../boards/solvable-medium-1.sudoku");
 
 
-    printf("************************ \n");
+    printf("************************ Single variable added ************************ \n");
 
     puts("solve_optimized_v0()");
     benchmark_runner("Fully Solved              ", ITERS, bench_test, (void*)solve_optimized_v0, "../boards/fully-solved.sudoku");

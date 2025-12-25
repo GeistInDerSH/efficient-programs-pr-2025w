@@ -1,15 +1,3 @@
-One particular run of the "sudoku_bench" binary:
-
-Each implementation is run ITER (currently at 100) times and the average between these runs is displayed in the terminal.
-The measurements are expressed is nanoseconds.
-For each input board, the measurements are done in two different ways:
-1) The total time spent to solve ONLY a number of ITER boards, divided by ITER value -> The time spent to solve ONLY one board
-2) The time spent to read the board, check its validity and to solve it. 
-It is run ITER times and the resulting time amount is divided by ITER.
-Obviosly, this number will be higher considering the same implementation for the same board.
-
-
-george@george-PC:~/Desktop/efficient-programs-pr-2025w/C$ ./sudoku_bench 
 ************************ Unoptimized ************************ 
 solve_unoptimized()
 Solver Only - Fully Solved              : 648 ns/iter
@@ -157,51 +145,3 @@ Solver Only - Solvable hard 1           : 869965 ns/iter
 Full Run    - Solvable hard 1           : 896560 ns/iter
 Solver Only - Solvable medium 1         : 31989 ns/iter
 Full Run    - Solvable medium 1         : 37148 ns/iter
-george@george-PC:~/Desktop/efficient-programs-pr-2025w/C$ 
-
-
-This input is copied to a file and a python script generates two plots for it.
-  1) solver_only.png  -> boards from "Solver Only - ..."
-  2) full_run.png     -> boards from "Full Run - ..." (includes invalid boards)
-
-X axis: boards (discrete, in first-seen order *per plot*)
-Y axis: time in ns/iter
-Each algorithm is represented by one line.
-
-To use the script:
-
-  python3 plot_bench.py --in bench.txt --outdir plots --logy
-  cat bench.txt | python3 plot_bench.py --outdir plots
-
-
-
-Observations:
-
-1) solver_only.png 
-- The pattern is identical for all the optimizations, there being 2 spikes
-- A good performance was made by the optimized version 2 - the Bitmask approach
-- The next one in terms of performance is the optimized version 4 - Loop unrolling 
-- The third one is the optimized version 3 - Cache optimizations 
-- The fourth place is taken by the optimized version 1 - Combined loops 
-- The fifth place is optimized version 5 - Lookup table 
-- The last two places are shared between the optimized version 0 and the unoptimized version.
-Surprinsigly, the optimized version 0 doesn't have a clear overall performance over the unoptimized one.
-For this particular measurement, the optimized version 0 performs better than the unoptimized version for the "Solvable 2x Hard" board, but 
-for the rest of the boards the performance is lower or almost equal in the best case.
-
-2) full_run.png 
-- we can observe the pattern is similar with the above plot 
-
-For a better understanding of the differences, I've also generated two additional plots for each case in which for the OY axis the log scale is used. 
-
-
-
-
-
-
-
-
-
-
-
-
