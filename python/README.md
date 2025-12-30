@@ -10,7 +10,14 @@ This implementation is the default implementation, on which the optimization wil
 Here is the optimized implementation.
 
 ## How to run
-To run the program, use the following command:
+To run the program, use the following command for the unoptimzed version:
 ```bash
 python solver_unoptimized/sudoku_unoptimized.py ex.txt
+```
+
+To run optimized version, use the following commands:
+
+For v1 solver:
+```bash
+python solver_optimized/sudoku_optimized_v1.py ex2.txt
 ```
