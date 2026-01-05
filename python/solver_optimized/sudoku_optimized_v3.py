@@ -39,47 +39,47 @@ def print_board(board):
         print()
 
 
-def build_used_sets(board: List[List[int]]):
+def build_masks(board: List[List[int]]):
     """
-    Builds sets for used numbers in rows, columns, and boxes.
+    Builds digit masks for numbers in rows, columns, and boxes.
     """
-    row_used: List[Set[int]] = [set() for _ in range(9)]
-    col_used: List[Set[int]] = [set() for _ in range(9)]
-    box_used: List[Set[int]] = [set() for _ in range(9)]
+    row_digits = [0]*9
+    col_digits = [0]*9
+    box_digits = [0]*9
 
     for r in range(9):
         for c in range(9):
             val = board[r][c]
             if val != 0:
-                row_used[r].add(val)
-                col_used[c].add(val)
-                bidx = (r // 3) * 3 + (c // 3)
-                box_used[bidx].add(val)
-    return row_used, col_used, box_used
+                mask = 1 << (board[r][c] - 1)
+                box_digits[(r // 3) * 3 + (c // 3)] |= mask
+                row_digits[r] |= mask
+                col_digits[c] |= mask
+    return row_digits, col_digits, box_digits
 
 
-def find_mrv(board, row_used, col_used, box_used):
+def find_mrv(board, row_mask, col_mask, box_mask):
     """
-    Finds the MRV values by using a heap
+    Finds the MRV values by using a heap and bit masking
     :param board:
-    :param row_used:
-    :param col_used:
-    :param box_used:
+    :param row_mask:
+    :param col_mask:
+    :param box_mask:
     :return:
     """
     heap = list()
     for row in range(9):
         for col in range(9):
             if board[row][col] == 0:
-                candidates = allowedValues(row, col, row_used, col_used, box_used)
-                cand_len = len(candidates)
-                if cand_len == 0:
-                    return None, None
+                candidates = allowedValues(row, col, row_mask, col_mask, box_mask)
+                cand_cnt = candidates.bit_count()
+                if cand_cnt == 0:
+                    return None, 0
                 # if candidate count is 1, best solution found
-                if cand_len == 1:
+                if cand_cnt == 1:
                     return (row, col), candidates
                 # Store candidate length, row, col and the candidates in the heap
-                heapq.heappush(heap, (len(candidates), row, col, candidates))
+                heapq.heappush(heap, (cand_cnt, row, col, candidates))
     if not heap:
         return None, None
     # Get row, col and candidates from the heap by poping these values
@@ -87,45 +87,45 @@ def find_mrv(board, row_used, col_used, box_used):
     return (row, col), candidates
 
 
-def allowedValues(row: int, col: int, row_used: List[Set[int]], col_used: List[Set[int]],
-                  box_used: List[Set[int]]) -> Set[int]:
+def allowedValues(row: int, col: int, row_mask, col_mask, box_mask):
     """
-    Returns the set of possible numbers
-    using the precomputed row, col, box used sets.
+    Returns the set of possible numbers as bits
+    using the precomputed row, col and box.
     """
     bidx = (row // 3) * 3 + (col // 3)
-    return set(range(1, 10)) - (row_used[row] | col_used[col] | box_used[bidx])
+    used_mask = (row_mask[row] | col_mask[col] | box_mask[bidx])
+    all_nums = (1 << 9) - 1
+    return all_nums & ~used_mask
 
 
-def solve_puzzle(board: List[List[int]],
-                 row_used: List[Set[int]],
-                 col_used: List[Set[int]],
-                 box_used: List[Set[int]]) -> bool:
+def solve_puzzle(board: List[List[int]], row_mask, col_mask, box_mask) -> bool:
     """
     The recursive method to solve the puzzle.
     :return:
     """
-    best_pos, candidates = find_mrv(board, row_used, col_used, box_used)
+    best_pos, candidates_mask = find_mrv(board, row_mask, col_mask, box_mask)
     if best_pos is None:
-        if candidates is None:
-            return True
-        else:
-            return False
+        return True
     row, col = best_pos
     bidx = (row // 3) * 3 + (col // 3)
 
-    for num in candidates:
+    while candidates_mask:
+        digit = candidates_mask & -candidates_mask
+        num = digit.bit_length()
         board[row][col] = num
-        row_used[row].add(num)
-        col_used[col].add(num)
-        box_used[bidx].add(num)
+        row_mask[row] |= digit
+        col_mask[col] |= digit
+        box_mask[bidx] |= digit
 
-        if solve_puzzle(board, row_used, col_used, box_used):
+        if solve_puzzle(board, row_mask, col_mask, box_mask):
             return True
         board[row][col] = 0
-        row_used[row].remove(num)
-        col_used[col].remove(num)
-        box_used[bidx].remove(num)
+        # Removing digit using NOT operator
+        row_mask[row] ^= digit
+        col_mask[col] ^= digit
+        box_mask[bidx] ^= digit
+        # Removes digit using NOT operator from candidates mask
+        candidates_mask ^= digit
 
     return False
 
@@ -144,7 +144,7 @@ def main(argv):
     try:
         board: List[List[int]] = []
         read_board(path, board)
-        row_used, col_used, box_used = build_used_sets(board)
+        row_used, col_used, box_used = build_masks(board)
     except Exception as e:
         print(f"Error reading data: {e}")
         return 1
