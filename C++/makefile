@@ -3,8 +3,8 @@ CXX := g++
 CXXFLAGS = -std=c++17 -O2 -Wall -Wextra -pedantic
 
 # Source Files
-SOURCES  = sudoku_unoptimize.cpp
-HEADERS  = sudoku_unoptimize.hpp
+SOURCES  = unoptimized/sudoku_unoptimize.cpp
+HEADERS  = unoptimized/sudoku_unoptimize.hpp
 
 # Common objects
 OBJECTS  = $(SOURCES:.cpp=.o)
