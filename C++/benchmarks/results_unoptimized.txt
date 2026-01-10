@@ -1,0 +1,102 @@
+===== fully-solved.sudoku =====
+Solver benchmark unoptimized (C++)
+Board: ../../boards/fully-solved.sudoku
+Iterations: 1000
+
+Average time per iteration: 255 ns
+Average time per iteration: 0.255 µs
+Average time per iteration: 0.000255 ms
+
+===== invalid-col-collision.sudoku =====
+Solver benchmark unoptimized (C++)
+Board: ../../boards/invalid-col-collision.sudoku
+Iterations: 1000
+
+Average time per iteration: 1851 ns
+Average time per iteration: 1.851 µs
+Average time per iteration: 0.001851 ms
+
+===== solvable-2x-hard.sudoku =====
+Solver benchmark unoptimized (C++)
+Board: ../../boards/solvable-2x-hard.sudoku
+Iterations: 1000
+
+Average time per iteration: 5256043 ns
+Average time per iteration: 5256.04 µs
+Average time per iteration: 5.25604 ms
+
+===== solvable-extra-hard-1.sudoku =====
+Solver benchmark unoptimized (C++)
+Board: ../../boards/solvable-extra-hard-1.sudoku
+Iterations: 1000
+
+Average time per iteration: 1251317 ns
+Average time per iteration: 1251.32 µs
+Average time per iteration: 1.25132 ms
+
+===== invalid-box-collision.sudoku =====
+Solver benchmark unoptimized (C++)
+Board: ../../boards/invalid-box-collision.sudoku
+Iterations: 1000
+
+Average time per iteration: 856 ns
+Average time per iteration: 0.856 µs
+Average time per iteration: 0.000856 ms
+
+===== invalid-row-col-collision.sudoku =====
+Solver benchmark unoptimized (C++)
+Board: ../../boards/invalid-row-col-collision.sudoku
+Iterations: 1000
+
+Average time per iteration: 345 ns
+Average time per iteration: 0.345 µs
+Average time per iteration: 0.000345 ms
+
+===== solvable-easy-1.sudoku =====
+Solver benchmark unoptimized (C++)
+Board: ../../boards/solvable-easy-1.sudoku
+Iterations: 1000
+
+Average time per iteration: 1831 ns
+Average time per iteration: 1.831 µs
+Average time per iteration: 0.001831 ms
+
+===== solvable-hard-1.sudoku =====
+Solver benchmark unoptimized (C++)
+Board: ../../boards/solvable-hard-1.sudoku
+Iterations: 1000
+
+Average time per iteration: 392199 ns
+Average time per iteration: 392.199 µs
+Average time per iteration: 0.392199 ms
+
+===== invalid-characters.sudoku =====
+Error reading file: ../../boards/invalid-characters.sudoku
+
+===== invalid-row-collision.sudoku =====
+Solver benchmark unoptimized (C++)
+Board: ../../boards/invalid-row-collision.sudoku
+Iterations: 1000
+
+Average time per iteration: 1833 ns
+Average time per iteration: 1.833 µs
+Average time per iteration: 0.001833 ms
+
+===== solvable-example-1.sudoku =====
+Solver benchmark unoptimized (C++)
+Board: ../../boards/solvable-example-1.sudoku
+Iterations: 1000
+
+Average time per iteration: 2301613 ns
+Average time per iteration: 2301.61 µs
+Average time per iteration: 2.30161 ms
+
+===== solvable-medium-1.sudoku =====
+Solver benchmark unoptimized (C++)
+Board: ../../boards/solvable-medium-1.sudoku
+Iterations: 1000
+
+Average time per iteration: 12764 ns
+Average time per iteration: 12.764 µs
+Average time per iteration: 0.012764 ms
+
