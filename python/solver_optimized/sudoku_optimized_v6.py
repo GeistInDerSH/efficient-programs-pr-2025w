@@ -27,10 +27,9 @@ def read_board(path: str, board: List[List[int]]):
     Reads the test files from the dataset directory
     :param path:
     """
-    current_directory = os.path.abspath('')
-    cleaned_path = current_directory.replace("\\solver_optimized", "")
-    relative_path_dataset = "\\dataset\\" + path
-    full_path = cleaned_path + relative_path_dataset
+    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    boards_dir = os.path.join(root_dir, "boards")
+    full_path = os.path.join(boards_dir, path)
     with open(full_path, "r", encoding="utf-8") as f:
         lines = [ln.strip() for ln in f.readlines() if ln.strip()]
     for i, ln in enumerate(lines):
@@ -201,7 +200,7 @@ def main(argv):
     if len(argv) > 1:
         path = argv[1]
     else:
-        path = "ex.txt"
+        path = "fully-solved.sudoku"
     try:
         board: List[List[int]] = []
         read_board(path, board)
