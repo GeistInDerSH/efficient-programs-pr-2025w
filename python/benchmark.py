@@ -8,7 +8,7 @@ import time
 import csv
 
 BOARDS_DIR = Path("../boards")
-RUNS = 50
+RUNS = 5
 
 PERF_EVENTS = ["cycles", "instructions"]
 CPU = "0"
