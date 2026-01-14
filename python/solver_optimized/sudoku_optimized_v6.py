@@ -4,7 +4,7 @@ import sys
 import os
 import time
 from collections import deque
-from typing import List, Optional, Tuple, Set
+from typing import List, Tuple
 
 Pos = Tuple[int, int]
 # precompute bidx using BOX_MAP
@@ -79,9 +79,6 @@ def naked_singles_pre_processing(board, row_mask, col_mask, box_mask):
     """
     q = deque()
     in_queue = [[False] * 9 for _ in range(9)]
-    row_mask_local = row_mask
-    col_mask_local = col_mask
-    box_mask_local = box_mask
     ALL_LOCAL = ALL_NUMS
     BOX_MAP_LOCAL = BOX_MAP
     # initial fill of queue with all empty cells
@@ -96,7 +93,7 @@ def naked_singles_pre_processing(board, row_mask, col_mask, box_mask):
         if board[r][c] != 0:
             continue
         bidx = BOX_MAP_LOCAL[r][c]
-        used_mask = row_mask_local[r] | col_mask_local[c] | box_mask_local[bidx]
+        used_mask = row_mask[r] | col_mask[c] | box_mask[bidx]
         candidates = ALL_LOCAL & ~used_mask
         cnt = candidates.bit_count()
         if cnt == 0:
@@ -106,9 +103,9 @@ def naked_singles_pre_processing(board, row_mask, col_mask, box_mask):
             digit = candidates & -candidates
             num = int(digit).bit_length()
             board[r][c] = num
-            row_mask_local[r] |= digit
-            col_mask_local[c] |= digit
-            box_mask_local[bidx] |= digit
+            row_mask[r] |= digit
+            col_mask[c] |= digit
+            box_mask[bidx] |= digit
             # row
             for nc in range(9):
                 if board[r][nc] == 0 and not in_queue[r][nc]:
@@ -138,9 +135,6 @@ def find_mrv(board, row_mask, col_mask, box_mask):
     :param box_mask:
     :return:
     """
-    row_mask_local = row_mask
-    col_mask_local = col_mask
-    box_mask_local = box_mask
     ALL_LOCAL = ALL_NUMS
     BOX_MAP_LOCAL = BOX_MAP
     heap = list()
@@ -148,7 +142,7 @@ def find_mrv(board, row_mask, col_mask, box_mask):
         for col in range(9):
             if board[row][col] == 0:
                 bidx = BOX_MAP_LOCAL[row][col]
-                used_mask = (row_mask_local[row] | col_mask_local[col] | box_mask_local[bidx])
+                used_mask = (row_mask[row] | col_mask[col] | box_mask[bidx])
                 candidates = ALL_LOCAL & ~used_mask
                 cand_cnt = candidates.bit_count()
                 if cand_cnt == 0:
@@ -176,24 +170,21 @@ def solve_puzzle(board: List[List[int]], row_mask, col_mask, box_mask) -> bool:
     row, col = best_pos
     BOX_MAP_LOCAL = BOX_MAP
     bidx = BOX_MAP_LOCAL[row][col]
-    row_mask_local = row_mask
-    col_mask_local = col_mask
-    box_mask_local = box_mask
     while candidates_mask:
         digit = candidates_mask & -candidates_mask
         num = digit.bit_length()
         board[row][col] = num
-        row_mask_local[row] |= digit
-        col_mask_local[col] |= digit
-        box_mask_local[bidx] |= digit
+        row_mask[row] |= digit
+        col_mask[col] |= digit
+        box_mask[bidx] |= digit
 
-        if solve_puzzle(board, row_mask_local, col_mask_local, box_mask_local):
+        if solve_puzzle(board, row_mask, col_mask, box_mask):
             return True
         board[row][col] = 0
         # Removing digit using NOT operator
-        row_mask_local[row] ^= digit
-        col_mask_local[col] ^= digit
-        box_mask_local[bidx] ^= digit
+        row_mask[row] ^= digit
+        col_mask[col] ^= digit
+        box_mask[bidx] ^= digit
         # Removes digit using NOT operator from candidates mask
         candidates_mask ^= digit
 
