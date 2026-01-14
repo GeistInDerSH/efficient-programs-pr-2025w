@@ -3,6 +3,7 @@ import heapq
 import sys
 import os
 import time
+from collections import deque
 from typing import List, Optional, Tuple, Set
 
 Pos = Tuple[int, int]
@@ -71,6 +72,58 @@ def build_masks(board: List[List[int]]):
     return row_digits, col_digits, box_digits
 
 
+def naked_singles_pre_processing(board, row_mask, col_mask, box_mask):
+    """
+    Method with naked-single propagation using a queue and bit masking
+    Inspired by: https://github.com/knottwill/SudokuMaster/blob/main/src/engine/elimination.py
+    """
+    q = deque()
+    in_queue = [[False] * 9 for _ in range(9)]
+    # initial fill of queue with all empty cells
+    for r in range(9):
+        for c in range(9):
+            if board[r][c] == 0:
+                q.append((r, c))
+                in_queue[r][c] = True
+    while q:
+        r, c = q.popleft()
+        in_queue[r][c] = False
+        if board[r][c] != 0:
+            continue
+        bidx = BOX_MAP[r][c]
+        used_mask = row_mask[r] | col_mask[c] | box_mask[bidx]
+        candidates = ALL_NUMS & ~used_mask
+        cnt = candidates.bit_count()
+        if cnt == 0:
+            # contradiction, so there are no candidates
+            return False
+        if cnt == 1:
+            digit = candidates & -candidates
+            num = int(digit).bit_length()
+            board[r][c] = num
+            row_mask[r] |= digit
+            col_mask[c] |= digit
+            box_mask[bidx] |= digit
+            # row
+            for nc in range(9):
+                if board[r][nc] == 0 and not in_queue[r][nc]:
+                    q.append((r, nc))
+                    in_queue[r][nc] = True
+            # column
+            for nr in range(9):
+                if board[nr][c] == 0 and not in_queue[nr][c]:
+                    q.append((nr, c))
+                    in_queue[nr][c] = True
+            # box
+            br = (r // 3) * 3
+            bc = (c // 3) * 3
+            for rr in range(br, br + 3):
+                for cc in range(bc, bc + 3):
+                    if board[rr][cc] == 0 and not in_queue[rr][cc]:
+                        q.append((rr, cc))
+                        in_queue[rr][cc] = True
+    return True
+
 def find_mrv(board, row_mask, col_mask, box_mask):
     """
     Finds the MRV values by using a heap and bit masking
@@ -100,17 +153,6 @@ def find_mrv(board, row_mask, col_mask, box_mask):
     # Get row, col and candidates from the heap by poping these values
     _, row, col, candidates = heapq.heappop(heap)
     return (row, col), candidates
-
-
-def allowedValues(row: int, col: int, row_mask, col_mask, box_mask):
-    """
-    Returns the set of possible numbers as bits
-    using the precomputed row, col and box.
-    """
-    bidx = (row // 3) * 3 + (col // 3)
-    used_mask = (row_mask[row] | col_mask[col] | box_mask[bidx])
-    all_nums = (1 << 9) - 1
-    return all_nums & ~used_mask
 
 
 def solve_puzzle(board: List[List[int]], row_mask, col_mask, box_mask) -> bool:
@@ -169,6 +211,9 @@ def main(argv):
 
     print('\nSolution found:')
     start = time.time()
+    if not naked_singles_pre_processing(board, row_used, col_used, box_used):
+        print("Contradiction found processing naked singles")
+        return 1
     solve_puzzle(board, row_used, col_used, box_used)
     print_board(board)
     end = time.time()
