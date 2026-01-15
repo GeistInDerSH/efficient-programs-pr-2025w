@@ -7,7 +7,7 @@ import Data.Bits (
 import Data.List (minimumBy)
 import System.Environment (getArgs)
 import Data.Array
--- import Criterion.Main
+import Criterion.Main
 
 -- Type aliases for readability
 type Grid = Array Int Int    -- 9x9 Sudoku grid stored as a flat list of 81 integers
@@ -147,43 +147,31 @@ showGrid :: Grid -> String
 showGrid g =
     unlines [ unwords [ show (g ! (r*9 + c)) | c <- [0..8] ] | r <- [0..8] ]
 
-puzzle =
-  [ "53--7----"
-  , "6--195---"
-  , "-98----6-"
-  , "8---6---3"
-  , "4--8-3--1"
-  , "7---2---6"
-  , "-6----28-"
-  , "---419--5"
-  , "----8--79"
-  ]
-
 -------------------------
 -- Main
 -------------------------
--- main :: IO ()
--- main = do
---   let puzzle =
---         [ "53--7----"
---         , "6--195---"
---         , "-98----6-"
---         , "8---6---3"
---         , "4--8-3--1"
---         , "7---2---6"
---         , "-6----28-"
---         , "---419--5"
---         , "----8--79"
---         ]
---   Criterion.Main.defaultMain
---     [ Criterion.Main.bench "solve puzzle" $
---         Criterion.Main.whnf (\ls ->
---             case parseGrid ls >>= \g ->
---                  initMasks g >>= \(r,c,b) -> solve g r c b of
---               Nothing -> 0
---               Just _  -> 1
---         ) puzzle
---     ]
+main :: IO ()
+main = do
+  let puzzle =
+        [ "53--7----"
+        , "6--195---"
+        , "-98----6-"
+        , "8---6---3"
+        , "4--8-3--1"
+        , "7---2---6"
+        , "-6----28-"
+        , "---419--5"
+        , "----8--79"
+        ]
+  Criterion.Main.defaultMain
+    [ Criterion.Main.bench "solve puzzle" $
+        Criterion.Main.whnf (\ls ->
+            case parseGrid ls >>= \g ->
+                 initMasks g >>= \(r,c,b) -> solve g r c b of
+              Nothing -> 0
+              Just _  -> 1
+        ) puzzle
+    ]
 
 {--main :: IO ()
 main = do
