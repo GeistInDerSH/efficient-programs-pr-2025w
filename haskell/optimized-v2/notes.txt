@@ -1,0 +1,8 @@
+Changes:
+
+Start: 60-90ms
+
+Add optimization flags to makefile, which allows ghc to optimize aggressively(50-60ms) 
+
+Replace everything with Data.Array for constant time indexing and updates. Avoid calculating constant values.
+Add additional types for clarity.
