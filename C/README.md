@@ -86,6 +86,42 @@ Solution:
 Took 760μs
 george@george-PC:~/Desktop/efficient-programs-pr-2025w/C$ 
 
+
+-----------> run "python3 benchmark.py" to measure the performance of each Sudoku version.
+
+The output will be generated in the file benchmark_results.csv.
+This python script runs each sudoku version with each board for five (5) times.
+
+It is measuring the time, cycles and instructions.
+It saves the minimum, average and maximum time for each program.
+The same happens with the cycles and the instructions 
+
+One example of the beginning of a "benchmark_results.csv" file:
+
+program,board,wall_ns_min,wall_ns_avg,wall_ns_max,cycles_min,cycles_avg,cycles_max,instructions_min,instructions_avg,instructions_max
+/home/george/Desktop/efficient-programs-pr-2025w/C/sudoku_solver 6,fully-solved.sudoku,22279986,33461934,71599939,2244014,7838358,14011740,0,0,0
+/home/george/Desktop/efficient-programs-pr-2025w/C/sudoku_solver 6,invalid-box-collision.sudoku,21473167,22942215,24431400,1544548,3378215,7884088,0,0,0
+/home/george/Desktop/efficient-programs-pr-2025w/C/sudoku_solver 6,invalid-col-collision.sudoku,22086386,24209699,27743068,1473564,6516551,22494670,0,0,0
+
+
+
+-----------> run "./sudoku_bench_csv" to get the same information as from "sudoku_bench", but saved into a csv file: "benchmark_results_c.csv"
+
+One example of the beginning of a "benchmark_results_c.csv" file:
+
+program,opt_index,board,mode,ns_per_iter_avg
+/home/ep25/ep52408125/Project/code/sudoku_bench_csv,0,fully-solved.sudoku,solver_only,2747
+/home/ep25/ep52408125/Project/code/sudoku_bench_csv,0,fully-solved.sudoku,full_run,16052
+/home/ep25/ep52408125/Project/code/sudoku_bench_csv,0,invalid-characters.sudoku,full_run,12284
+
+
+
+
+
+
+
+
+
 ********************* Sudoku explained *********************
 
 The board has the size 9 by 9 - 81 cells
