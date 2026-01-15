@@ -4,26 +4,53 @@ version = "0.1.0"
 edition = "2024"
 
 [features]
-default = ["solve_basic"]
+default = ["solve_bit_masking_v4"]
 solve_basic = []
 solve_basic_std_index = []
 solve_bit_masking_v1 = []
+solve_bit_masking_v1_si = ["solve_bit_masking_v1", "skip_intermediate_stack_frames"]
 solve_bit_masking_v2 = []
+solve_bit_masking_v2_si = ["solve_bit_masking_v2", "skip_intermediate_stack_frames"]
+solve_bit_masking_v3 = []
+solve_bit_masking_v3_cs_full = ["solve_bit_masking_v3", "constraint_solve_full_sort"]
+solve_bit_masking_v3_cs_full_ui = ["solve_bit_masking_v3", "constraint_solve_full_sort", "unchecked_indexing"]
+solve_bit_masking_v3_cs_min = ["solve_bit_masking_v3", "constraint_solve_minimal_sort"]
+solve_bit_masking_v3_cs_min_ui = ["solve_bit_masking_v3", "constraint_solve_minimal_sort", "unchecked_indexing"]
+solve_bit_masking_v4 = []
+solve_bit_masking_v4_ui = ["solve_bit_masking_v4", "unchecked_indexing"]
 solve_bitset_masking_v1 = []
 measure_runtime = []
+unchecked_indexing = []
+skip_intermediate_stack_frames = []
+constraint_solve_full_sort = []
+constraint_solve_minimal_sort = []
+raw_syscalls = []
 
 [dev-dependencies]
 criterion = "0.7.0"
 
 [dependencies]
 
+[lib]
+bench = false
+
+[[bin]]
+name = "sudoku-solver"
+path = "src/main.rs"
+bench = false
+
 [[bench]]
 name = "benchmarks"
 harness = false
 
+[profile.test]
+# Needed because solve_bit_masking_v3 relies on this,
+# which is not set in the release mode
+overflow-checks = false
+
 [profile.release]
 codegen-units = 1
-debug = "none"
+debug = true
 debug-assertions = false
 incremental = false
 lto = "fat"

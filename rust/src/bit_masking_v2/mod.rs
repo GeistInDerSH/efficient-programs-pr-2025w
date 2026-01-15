@@ -1,4 +1,4 @@
-/// Similar to bit_masking_v1, but delays the compares by bitwise-or'ing
+/// Similar to `bit_masking_v1`, but delays the compares by bitwise-or'ing
 /// the values then comparing the result all at once. This avoids extra
 /// compare/jump instructions.
 use crate::{Board, Solution};
@@ -9,6 +9,7 @@ use std::ops::Div;
 /// Additionally, track which bits have already been set in the grid by using three
 /// arrays of 9 u16s. This allows us to set the nth bit to indicate that the number has
 /// already been set in the row/column/box.
+#[cfg(not(feature = "skip_intermediate_stack_frames"))]
 fn solve(
     solution_grid: &mut Board,
     row_bits: &mut [u16; 9],
@@ -28,14 +29,8 @@ fn solve(
         for p in 1..=9 {
             let mask = 1 << p;
 
-            let any_seen = {
-                let mut seen = 0;
-                seen |= row_bits[row] & mask;
-                seen |= col_bits[col] & mask;
-                seen |= box_bits[box_number] & mask;
-                seen
-            };
-            if any_seen != 0 {
+            if (row_bits[row] & mask) | (col_bits[col] & mask) | (box_bits[box_number] & mask) != 0
+            {
                 continue;
             }
 
@@ -60,6 +55,64 @@ fn solve(
     }
 }
 
+/// Attempt to solve the sudoku grid by recursively calling [`solve`] to use backtracking.
+/// Additionally, track which bits have already been set in the grid by using three
+/// arrays of 9 u16s. This allows us to set the nth bit to indicate that the number has
+/// already been set in the row/column/box.
+///
+/// Unlike the default version, this version will attempt to skip any  intermediate stack
+/// frames by generating the next row/column to check.
+#[cfg(feature = "skip_intermediate_stack_frames")]
+fn solve(
+    grid: &mut Board,
+    rows: &mut [u16; 9],
+    cols: &mut [u16; 9],
+    boxes: &mut [u16; 9],
+    row: usize,
+    col: usize,
+) -> bool {
+    if row == 9 {
+        return true;
+    }
+
+    let (next_row, next_col) = if col + 1 > 8 {
+        (row + 1, 0)
+    } else {
+        (row, col + 1)
+    };
+
+    if grid[(row, col)] != 0 {
+        return solve(grid, rows, cols, boxes, next_row, next_col);
+    }
+
+    let box_number = row.div(3) * 3 + col.div(3);
+    for p in 1..=9 {
+        let mask = 1 << p;
+
+        if (rows[row] & mask) | (cols[col] & mask) | (boxes[box_number] & mask) != 0 {
+            continue;
+        }
+
+        // Set the values in the grid, and bitmask fields
+        grid[(row, col)] = p;
+        rows[row] |= mask;
+        cols[col] |= mask;
+        boxes[box_number] |= mask;
+
+        if solve(grid, rows, cols, boxes, next_row, next_col) {
+            return true;
+        }
+
+        // Not a solution, so rollback the above masking
+        grid[(row, col)] = 0;
+        rows[row] &= !mask;
+        cols[col] &= !mask;
+        boxes[box_number] &= !mask;
+    }
+
+    false
+}
+
 impl super::SudokuSolver for Board {
     fn solve(&self) -> Option<Solution> {
         let mut grid = Board(self.0);
@@ -78,14 +131,7 @@ impl super::SudokuSolver for Board {
 
                 let box_number = row.div(3) * 3 + col.div(3);
                 let mask = 1 << value;
-                let any_seen = {
-                    let mut seen = 0;
-                    seen |= rows[row] & mask;
-                    seen |= cols[col] & mask;
-                    seen |= boxes[box_number] & mask;
-                    seen
-                };
-                if any_seen != 0 {
+                if (rows[row] & mask) | (cols[col] & mask) | (boxes[box_number] & mask) != 0 {
                     return None;
                 }
 

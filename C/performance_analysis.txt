@@ -1,0 +1,207 @@
+One particular run of the "sudoku_bench" binary:
+
+Each implementation is run ITER (currently at 100) times and the average between these runs is displayed in the terminal.
+The measurements are expressed is nanoseconds.
+For each input board, the measurements are done in two different ways:
+1) The total time spent to solve ONLY a number of ITER boards, divided by ITER value -> The time spent to solve ONLY one board
+2) The time spent to read the board, check its validity and to solve it. 
+It is run ITER times and the resulting time amount is divided by ITER.
+Obviosly, this number will be higher considering the same implementation for the same board.
+
+
+george@george-PC:~/Desktop/efficient-programs-pr-2025w/C$ ./sudoku_bench 
+************************ Unoptimized ************************ 
+solve_unoptimized()
+Solver Only - Fully Solved              : 648 ns/iter
+Full Run    - Fully Solved              : 6487 ns/iter
+Full Run    - Invalid Characters        : 4698 ns/iter
+Full Run    - Invalid Box Collision     : 4326 ns/iter
+Full Run    - Invalid Col Collision     : 4220 ns/iter
+Full Run    - Invalid Row Col Collision : 5295 ns/iter
+Full Run    - Invalid Row Collision     : 4154 ns/iter
+Solver Only - Solvable 2x hard          : 11200058 ns/iter
+Full Run    - Solvable 2x hard          : 11023703 ns/iter
+Solver Only - Solvable Easy 1           : 4621 ns/iter
+Full Run    - Solvable Easy 1           : 9106 ns/iter
+Solver Only - Solvable example 1        : 5685980 ns/iter
+Full Run    - Solvable example 1        : 5612214 ns/iter
+Solver Only - Solvable extra hard 1     : 3087294 ns/iter
+Full Run    - Solvable extra hard 1     : 3045704 ns/iter
+Solver Only - Solvable hard 1           : 958331 ns/iter
+Full Run    - Solvable hard 1           : 961297 ns/iter
+Solver Only - Solvable medium 1         : 33971 ns/iter
+Full Run    - Solvable medium 1         : 45221 ns/iter
+************************ Single variable added ************************ 
+solve_optimized_v0()
+Solver Only - Fully Solved              : 676 ns/iter
+Full Run    - Fully Solved              : 6131 ns/iter
+Full Run    - Invalid Characters        : 4166 ns/iter
+Full Run    - Invalid Box Collision     : 6867 ns/iter
+Full Run    - Invalid Col Collision     : 4467 ns/iter
+Full Run    - Invalid Row Col Collision : 5052 ns/iter
+Full Run    - Invalid Row Collision     : 4452 ns/iter
+Solver Only - Solvable 2x hard          : 11811757 ns/iter
+Full Run    - Solvable 2x hard          : 11381463 ns/iter
+Solver Only - Solvable Easy 1           : 4527 ns/iter
+Full Run    - Solvable Easy 1           : 10240 ns/iter
+Solver Only - Solvable example 1        : 5345481 ns/iter
+Full Run    - Solvable example 1        : 5077185 ns/iter
+Solver Only - Solvable extra hard 1     : 2460836 ns/iter
+Full Run    - Solvable extra hard 1     : 2420388 ns/iter
+Solver Only - Solvable hard 1           : 796405 ns/iter
+Full Run    - Solvable hard 1           : 796058 ns/iter
+Solver Only - Solvable medium 1         : 29701 ns/iter
+Full Run    - Solvable medium 1         : 35311 ns/iter
+************************ Combined loops ************************ 
+solve_optimized_v1()
+Solver Only - Fully Solved              : 672 ns/iter
+Full Run    - Fully Solved              : 6214 ns/iter
+Full Run    - Invalid Characters        : 4113 ns/iter
+Full Run    - Invalid Box Collision     : 5159 ns/iter
+Full Run    - Invalid Col Collision     : 4459 ns/iter
+Full Run    - Invalid Row Col Collision : 5114 ns/iter
+Full Run    - Invalid Row Collision     : 4406 ns/iter
+Solver Only - Solvable 2x hard          : 10442585 ns/iter
+Full Run    - Solvable 2x hard          : 10490217 ns/iter
+Solver Only - Solvable Easy 1           : 4348 ns/iter
+Full Run    - Solvable Easy 1           : 9633 ns/iter
+Solver Only - Solvable example 1        : 4864796 ns/iter
+Full Run    - Solvable example 1        : 4759942 ns/iter
+Solver Only - Solvable extra hard 1     : 2481384 ns/iter
+Full Run    - Solvable extra hard 1     : 2461031 ns/iter
+Solver Only - Solvable hard 1           : 781567 ns/iter
+Full Run    - Solvable hard 1           : 790739 ns/iter
+Solver Only - Solvable medium 1         : 29949 ns/iter
+Full Run    - Solvable medium 1         : 38018 ns/iter
+************************ Bitmask ************************ 
+solve_optimized_v2()
+Solver Only - Fully Solved              : 1616 ns/iter
+Full Run    - Fully Solved              : 8528 ns/iter
+Full Run    - Invalid Characters        : 4212 ns/iter
+Full Run    - Invalid Box Collision     : 5221 ns/iter
+Full Run    - Invalid Col Collision     : 4502 ns/iter
+Full Run    - Invalid Row Col Collision : 4418 ns/iter
+Full Run    - Invalid Row Collision     : 4410 ns/iter
+Solver Only - Solvable 2x hard          : 3000808 ns/iter
+Full Run    - Solvable 2x hard          : 3048391 ns/iter
+Solver Only - Solvable Easy 1           : 2426 ns/iter
+Full Run    - Solvable Easy 1           : 6574 ns/iter
+Solver Only - Solvable example 1        : 1389064 ns/iter
+Full Run    - Solvable example 1        : 1380236 ns/iter
+Solver Only - Solvable extra hard 1     : 700722 ns/iter
+Full Run    - Solvable extra hard 1     : 698230 ns/iter
+Solver Only - Solvable hard 1           : 212803 ns/iter
+Full Run    - Solvable hard 1           : 227610 ns/iter
+Solver Only - Solvable medium 1         : 9441 ns/iter
+Full Run    - Solvable medium 1         : 14093 ns/iter
+************************ Cache optimizations ************************ 
+solve_optimized_v3()
+Solver Only - Fully Solved              : 259 ns/iter
+Full Run    - Fully Solved              : 5100 ns/iter
+Full Run    - Invalid Characters        : 4734 ns/iter
+Full Run    - Invalid Box Collision     : 4683 ns/iter
+Full Run    - Invalid Col Collision     : 5267 ns/iter
+Full Run    - Invalid Row Col Collision : 4540 ns/iter
+Full Run    - Invalid Row Collision     : 4518 ns/iter
+Solver Only - Solvable 2x hard          : 9648425 ns/iter
+Full Run    - Solvable 2x hard          : 9616084 ns/iter
+Solver Only - Solvable Easy 1           : 3478 ns/iter
+Full Run    - Solvable Easy 1           : 9100 ns/iter
+Solver Only - Solvable example 1        : 4442485 ns/iter
+Full Run    - Solvable example 1        : 4535278 ns/iter
+Solver Only - Solvable extra hard 1     : 2254408 ns/iter
+Full Run    - Solvable extra hard 1     : 2289009 ns/iter
+Solver Only - Solvable hard 1           : 688870 ns/iter
+Full Run    - Solvable hard 1           : 707651 ns/iter
+Solver Only - Solvable medium 1         : 26774 ns/iter
+Full Run    - Solvable medium 1         : 32109 ns/iter
+************************ Loop unrolling ************************ 
+solve_optimized_v4()
+Solver Only - Fully Solved              : 678 ns/iter
+Full Run    - Fully Solved              : 5585 ns/iter
+Full Run    - Invalid Characters        : 4909 ns/iter
+Full Run    - Invalid Box Collision     : 4639 ns/iter
+Full Run    - Invalid Col Collision     : 5076 ns/iter
+Full Run    - Invalid Row Col Collision : 4456 ns/iter
+Full Run    - Invalid Row Collision     : 5059 ns/iter
+Solver Only - Solvable 2x hard          : 6999138 ns/iter
+Full Run    - Solvable 2x hard          : 7140059 ns/iter
+Solver Only - Solvable Easy 1           : 3096 ns/iter
+Full Run    - Solvable Easy 1           : 8407 ns/iter
+Solver Only - Solvable example 1        : 3206376 ns/iter
+Full Run    - Solvable example 1        : 3285086 ns/iter
+Solver Only - Solvable extra hard 1     : 1723396 ns/iter
+Full Run    - Solvable extra hard 1     : 1716075 ns/iter
+Solver Only - Solvable hard 1           : 547566 ns/iter
+Full Run    - Solvable hard 1           : 561536 ns/iter
+Solver Only - Solvable medium 1         : 20559 ns/iter
+Full Run    - Solvable medium 1         : 24879 ns/iter
+************************ Lookup table ************************ 
+solve_optimized_v5()
+Solver Only - Fully Solved              : 714 ns/iter
+Full Run    - Fully Solved              : 6167 ns/iter
+Full Run    - Invalid Characters        : 4860 ns/iter
+Full Run    - Invalid Box Collision     : 4564 ns/iter
+Full Run    - Invalid Col Collision     : 5013 ns/iter
+Full Run    - Invalid Row Col Collision : 4430 ns/iter
+Full Run    - Invalid Row Collision     : 5080 ns/iter
+Solver Only - Solvable 2x hard          : 10853048 ns/iter
+Full Run    - Solvable 2x hard          : 10720143 ns/iter
+Solver Only - Solvable Easy 1           : 5743 ns/iter
+Full Run    - Solvable Easy 1           : 10828 ns/iter
+Solver Only - Solvable example 1        : 5130011 ns/iter
+Full Run    - Solvable example 1        : 5075831 ns/iter
+Solver Only - Solvable extra hard 1     : 2647982 ns/iter
+Full Run    - Solvable extra hard 1     : 2711785 ns/iter
+Solver Only - Solvable hard 1           : 869965 ns/iter
+Full Run    - Solvable hard 1           : 896560 ns/iter
+Solver Only - Solvable medium 1         : 31989 ns/iter
+Full Run    - Solvable medium 1         : 37148 ns/iter
+george@george-PC:~/Desktop/efficient-programs-pr-2025w/C$ 
+
+
+This input is copied to a file and a python script generates two plots for it.
+  1) solver_only.png  -> boards from "Solver Only - ..."
+  2) full_run.png     -> boards from "Full Run - ..." (includes invalid boards)
+
+X axis: boards (discrete, in first-seen order *per plot*)
+Y axis: time in ns/iter
+Each algorithm is represented by one line.
+
+To use the script:
+
+  python3 plot_bench.py --in bench.txt --outdir plots --logy
+  cat bench.txt | python3 plot_bench.py --outdir plots
+
+
+
+Observations:
+
+1) solver_only.png 
+- The pattern is identical for all the optimizations, there being 2 spikes
+- A good performance was made by the optimized version 2 - the Bitmask approach
+- The next one in terms of performance is the optimized version 4 - Loop unrolling 
+- The third one is the optimized version 3 - Cache optimizations 
+- The fourth place is taken by the optimized version 1 - Combined loops 
+- The fifth place is optimized version 5 - Lookup table 
+- The last two places are shared between the optimized version 0 and the unoptimized version.
+Surprinsigly, the optimized version 0 doesn't have a clear overall performance over the unoptimized one.
+For this particular measurement, the optimized version 0 performs better than the unoptimized version for the "Solvable 2x Hard" board, but 
+for the rest of the boards the performance is lower or almost equal in the best case.
+
+2) full_run.png 
+- we can observe the pattern is similar with the above plot 
+
+For a better understanding of the differences, I've also generated two additional plots for each case in which for the OY axis the log scale is used. 
+
+
+
+
+
+
+
+
+
+
+
+

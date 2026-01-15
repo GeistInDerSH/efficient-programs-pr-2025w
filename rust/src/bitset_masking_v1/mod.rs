@@ -2,19 +2,19 @@ use crate::{Board, Solution};
 use std::ops::Div;
 
 /// Attempt to pack the values seen in the rows/column/box into a
-/// bitset to reduce space over the version in bit_masking_v1
+/// bitset to reduce space over the version in `bit_masking_v1`
 struct BitSet {
-    row_bits: u128,
-    col_bits: u128,
-    box_bits: u128,
+    row: u128,
+    col: u128,
+    boxes: u128,
 }
 
 impl BitSet {
     fn new() -> Self {
         Self {
-            row_bits: 0,
-            col_bits: 0,
-            box_bits: 0,
+            row: 0,
+            col: 0,
+            boxes: 0,
         }
     }
 
@@ -56,39 +56,39 @@ impl BitSet {
     }
 
     fn row_set_or(&mut self, mask: u128) {
-        self.row_bits |= mask;
+        self.row |= mask;
     }
 
     fn row_set_and(&mut self, mask: u128) {
-        self.row_bits &= mask;
+        self.row &= mask;
     }
 
     fn row_and(&mut self, mask: u128) -> u128 {
-        self.row_bits & mask
+        self.row & mask
     }
 
     fn col_set_or(&mut self, mask: u128) {
-        self.col_bits |= mask;
+        self.col |= mask;
     }
 
     fn col_set_and(&mut self, mask: u128) {
-        self.col_bits &= mask;
+        self.col &= mask;
     }
 
     fn col_and(&mut self, mask: u128) -> u128 {
-        self.col_bits & mask
+        self.col & mask
     }
 
     fn box_set_or(&mut self, mask: u128) {
-        self.box_bits |= mask;
+        self.boxes |= mask;
     }
 
     fn box_set_and(&mut self, mask: u128) {
-        self.box_bits &= mask;
+        self.boxes &= mask;
     }
 
     fn box_and(&mut self, mask: u128) -> u128 {
-        self.box_bits & mask
+        self.boxes & mask
     }
 }
 

@@ -1,5 +1,6 @@
-use std::fmt::{Debug, Display};
+use std::fmt::{Debug, Display, Write};
 use std::io;
+#[allow(unused)]
 use std::io::Read;
 use std::ops::{Index, IndexMut};
 
@@ -11,6 +12,10 @@ pub mod basic_std_index;
 pub mod bit_masking_v1;
 #[cfg(feature = "solve_bit_masking_v2")]
 pub mod bit_masking_v2;
+#[cfg(feature = "solve_bit_masking_v3")]
+pub mod bit_masking_v3;
+#[cfg(feature = "solve_bit_masking_v4")]
+pub mod bit_masking_v4;
 #[cfg(feature = "solve_bitset_masking_v1")]
 pub mod bitset_masking_v1;
 
@@ -78,14 +83,78 @@ impl From<[[u8; 9]; 9]> for Board {
     }
 }
 
+impl TryFrom<&[u8]> for Board {
+    type Error = &'static str;
+
+    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
+        match bytes.len() {
+            // The entire board is given as a 1d array of bytes. This is a shortcut
+            // because we can optimize away some checks for newlines and just do 81 cmps
+            81 => {
+                let mut buffer = [0; 81];
+                for (buff, value) in buffer.iter_mut().zip(bytes) {
+                    match value {
+                        b'0'..=b'9' => *buff = *value - b'0',
+                        b'.' | b'_' => *buff = 0,
+                        _ => return Err("Invalid input"),
+                    }
+                }
+
+                Ok(Board(buffer))
+            }
+            // For all other input grids, there could be more characters, e.g. newlines
+            // which need to be handled.
+            _ => {
+                let mut buffer = [0; 81];
+                let mut index = 0;
+                for i in bytes {
+                    match *i {
+                        b'0'..=b'9' => {
+                            #[cfg(not(feature = "unchecked_indexing"))]
+                            {
+                                buffer[index] = *i - b'0';
+                            }
+                            #[cfg(feature = "unchecked_indexing")]
+                            unsafe {
+                                *buffer.get_unchecked_mut(index) = *i - b'0';
+                            }
+                            index += 1;
+                        }
+                        b'.' | b'_' => {
+                            #[cfg(not(feature = "unchecked_indexing"))]
+                            {
+                                buffer[index] = 0;
+                            }
+                            #[cfg(feature = "unchecked_indexing")]
+                            unsafe {
+                                *buffer.get_unchecked_mut(index) = 0;
+                            }
+                            index += 1;
+                        }
+                        b'\n' => {}
+                        _ => return Err("Invalid input"),
+                    }
+                }
+
+                if index == 81 {
+                    Ok(Board(buffer))
+                } else {
+                    Err("Invalid input")
+                }
+            }
+        }
+    }
+}
+
 impl Display for Board {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for row in 0..9 {
-            for col in 0..9 {
-                write!(f, "{}", self.0[row * 9 + col])?;
+        for (i, v) in self.0.iter().enumerate() {
+            if matches!(i, 9 | 18 | 27 | 36 | 45 | 54 | 63 | 72 | 81) {
+                f.write_char('\n')?;
             }
-            writeln!(f)?;
+            f.write_char((*v + b'0') as char)?;
         }
+        f.write_char('\n')?;
         Ok(())
     }
 }
@@ -95,7 +164,29 @@ impl Index<(usize, usize)> for Board {
     type Output = u8;
 
     fn index(&self, index: (usize, usize)) -> &Self::Output {
-        &self.0[index.0 * 9 + index.1]
+        #[cfg(not(feature = "unchecked_indexing"))]
+        {
+            &self.0[index.0 * 9 + index.1]
+        }
+        #[cfg(feature = "unchecked_indexing")]
+        unsafe {
+            self.0.get_unchecked(index.0 * 9 + index.1)
+        }
+    }
+}
+
+impl Index<usize> for Board {
+    type Output = u8;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        #[cfg(not(feature = "unchecked_indexing"))]
+        {
+            &self.0[index]
+        }
+        #[cfg(feature = "unchecked_indexing")]
+        unsafe {
+            self.0.get_unchecked(index)
+        }
     }
 }
 
@@ -103,7 +194,27 @@ impl Index<(usize, usize)> for Board {
 /// mutating the value at the index.
 impl IndexMut<(usize, usize)> for Board {
     fn index_mut(&mut self, index: (usize, usize)) -> &mut Self::Output {
-        &mut self.0[index.0 * 9 + index.1]
+        #[cfg(not(feature = "unchecked_indexing"))]
+        {
+            &mut self.0[index.0 * 9 + index.1]
+        }
+        #[cfg(feature = "unchecked_indexing")]
+        unsafe {
+            self.0.get_unchecked_mut(index.0 * 9 + index.1)
+        }
+    }
+}
+
+impl IndexMut<usize> for Board {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        #[cfg(not(feature = "unchecked_indexing"))]
+        {
+            &mut self.0[index]
+        }
+        #[cfg(feature = "unchecked_indexing")]
+        unsafe {
+            self.0.get_unchecked_mut(index)
+        }
     }
 }
 
@@ -113,6 +224,69 @@ impl Debug for Board {
     }
 }
 
+/// A quick shortcut to allow for "raw" x64 syscalls to be made on Linux.
+/// This is controlled via the `raw_syscalls` feature flag. Because we only
+/// use it for Open/Read/Close (in that order).
+///
+/// This was only made because using `cargo flamegraph` showed that when there
+/// are lots of runs, the main function spends a lot of time in the Rust
+/// fs::open function. This is likely because of some ffi reasons of converting
+/// between Rust strings and C-Strings.
+#[allow(unused)]
+#[inline(always)]
+#[cfg(all(feature = "raw_syscalls", target_arch = "x86_64", target_os = "linux"))]
+fn x64_linux_syscall(syscall_id: u64, rdi: u64, rsi: u64, rdx: u64) -> i64 {
+    let ret: i64;
+    unsafe {
+        std::arch::asm!(
+        "syscall",
+        in("rax") syscall_id,
+        in("rdi") rdi,
+        in("rsi") rsi,
+        in("rdx") rdx,
+        lateout("rax") ret,
+        options(nostack)
+        );
+    }
+    ret
+}
+
+#[allow(unused)]
+#[inline(always)]
+#[cfg(all(feature = "raw_syscalls", target_arch = "x86_64", target_os = "linux"))]
+fn read_to_buffer(filename: &str) -> io::Result<[u8; 89]> {
+    // Syscall ID and expected register value information pulled from:
+    // https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/
+    // This info is also in the Linux Kernel, but the above table include the
+    // registers, and what the contents should be.
+    const SYSCALL_READ: u64 = 0;
+    const SYSCALL_OPEN: u64 = 2;
+    const SYSCALL_CLOSE: u64 = 3;
+
+    let c_file_path = std::ffi::CString::new(filename)?;
+    let path_ptr = c_file_path.as_ptr() as u64;
+    let fd: i64 = x64_linux_syscall(SYSCALL_OPEN, path_ptr, 0, 0);
+    if fd < 0 {
+        return Err(io::Error::other("Failed to open file"));
+    }
+    let fd = fd as u64;
+
+    let mut data = [0u8; 89];
+    let bytes_read = x64_linux_syscall(
+        SYSCALL_READ,
+        fd,
+        data.as_mut_ptr() as u64,
+        data.len() as u64,
+    );
+    if bytes_read == !0 {
+        return Err(io::Error::other("Failed to read file"));
+    }
+
+    x64_linux_syscall(SYSCALL_CLOSE, fd, 0, 0);
+
+    Ok(data)
+}
+
 /// Attempt to read a sudoku board from a file.
 ///
 /// # Errors
@@ -120,34 +294,21 @@ impl Debug for Board {
 /// * The file is smaller than 89 bytes
 /// * Data in the file is not digits 0 to 9
 pub fn read_file(filename: &str) -> io::Result<Board> {
-    let mut file = std::fs::File::open(filename)?;
+    #[cfg(not(all(feature = "raw_syscalls", target_os = "linux", target_arch = "x86_64")))]
+    let data = {
+        let mut file = std::fs::File::open(filename)?;
 
-    // 9 rows of 10 chars, but the last may leave out the new-line
-    let mut data = [0; 89];
-    let _ = file.read(&mut data)?;
+        // 9 rows of 10 chars, but the last may leave out the new-line
+        let mut data = [0; 89];
+        let _ = file.read(&mut data)?;
+        data
+    };
+    #[cfg(all(feature = "raw_syscalls", target_arch = "x86_64", target_os = "linux"))]
+    let data = read_to_buffer(filename)?;
 
-    // Copy bytes out of the string. Each line should be 10 bytes long, 9 digits and 1 new line.
-    // Because of the new line, we need to add a small correction when addressing into the 1d array
-    let mut buffer = [0; 81];
-    let mut index = 0;
-    for i in &data {
-        match *i {
-            b'0'..=b'9' => {
-                buffer[index] = *i - b'0';
-                index += 1;
-            }
-            b'\n' => {}
-            _ => {
-                return Err(io::Error::new(io::ErrorKind::InvalidData, "Invalid input"));
-            }
-        }
-    }
-
-    if index == 81 {
-        Ok(buffer.into())
-    } else {
-        Err(io::Error::new(io::ErrorKind::InvalidData, "Invalid input"))
-    }
+    data.as_slice()
+        .try_into()
+        .map_err(|msg| io::Error::new(io::ErrorKind::InvalidData, msg))
 }
 
 /// This is a macro that evaluates an expression, i.e. the body, and returns the result
@@ -307,6 +468,35 @@ pub mod example_boards {
 mod tests {
     use super::*;
     use crate::SudokuSolver;
+    use std::collections::HashSet;
+
+    fn is_valid_solution(solved_board: &Solution) -> bool {
+        let mut rows = vec![HashSet::new(); 9];
+        let mut cols = vec![HashSet::new(); 9];
+        let mut boxes = vec![HashSet::new(); 9];
+
+        for row in 0..9 {
+            for col in 0..9 {
+                let value = solved_board[(row, col)];
+                let box_number = (row / 3) * 3 + (col / 3);
+                if !rows[row].insert(value)
+                    || !cols[col].insert(value)
+                    || !boxes[box_number].insert(value)
+                {
+                    return false;
+                }
+            }
+        }
+
+        let expected = HashSet::from([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        for i in 0..9 {
+            if expected != rows[i] || expected != cols[i] || expected != boxes[i] {
+                return false;
+            }
+        }
+
+        true
+    }
 
     #[test]
     fn test_is_valid() {
@@ -323,6 +513,7 @@ mod tests {
         let board = example_boards::EASY_BOARD;
         let solution = board.solve();
         assert!(solution.is_some());
+        assert!(is_valid_solution(&solution.unwrap()));
     }
 
     #[test]
@@ -330,6 +521,7 @@ mod tests {
         let board = example_boards::MEDIUM_BOARD;
         let solution = board.solve();
         assert!(solution.is_some());
+        assert!(is_valid_solution(&solution.unwrap()));
     }
 
     #[test]
@@ -337,6 +529,7 @@ mod tests {
         let board = example_boards::HARD_BOARD;
         let solution = board.solve();
         assert!(solution.is_some());
+        assert!(is_valid_solution(&solution.unwrap()));
     }
 
     #[test]
@@ -344,6 +537,7 @@ mod tests {
         let board = example_boards::EXTRA_HARD_BOARD;
         let solution = board.solve();
         assert!(solution.is_some());
+        assert!(is_valid_solution(&solution.unwrap()));
     }
 
     #[test]
@@ -351,6 +545,7 @@ mod tests {
         let board = example_boards::HARD_2X_BOARD;
         let solution = board.solve();
         assert!(solution.is_some());
+        assert!(is_valid_solution(&solution.unwrap()));
     }
 
     #[test]
