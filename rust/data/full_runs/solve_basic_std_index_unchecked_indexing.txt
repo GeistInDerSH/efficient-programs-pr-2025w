@@ -1,0 +1,7 @@
+test solvable/fully solved ... bench:       3,494 ns/iter (+/- 47)
+test full runs/full run/easy ... bench:       6,549 ns/iter (+/- 32)
+test full runs/full run/medium ... bench:      11,184 ns/iter (+/- 43)
+test full runs/full run/hard ... bench:     228,611 ns/iter (+/- 1,519)
+test full runs/full run/extra hard ... bench:     735,927 ns/iter (+/- 12,194)
+test full runs/full run/2x hard ... bench:   2,906,218 ns/iter (+/- 11,741)
+test full runs/full run/fully solved ... bench:       7,444 ns/iter (+/- 34)
