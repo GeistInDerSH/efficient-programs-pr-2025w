@@ -1,0 +1,7 @@
+Changes:
+
+Start: 60-90ms
+
+Add optimization flags to makefile, which allows ghc to optimize aggressively(50-60ms) 
+
+Change arrays to vectors. Vectors are not newly allocated every time a cell is updated. Increased time -> not kept

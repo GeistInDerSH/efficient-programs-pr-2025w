@@ -1,125 +1,183 @@
--- Sudoku.hs
--- Sudoku solver that accepts input with 0 or '-' for blanks
+{-# LANGUAGE BangPatterns #-}
 
-import System.Environment (getArgs)
-import Data.List (transpose, minimumBy, (\\), intercalate)
-import Data.Maybe (listToMaybe)
 import Data.Ord (comparing)
+import Data.Bits (
+    Bits(testBit, setBit, complement, (.&.), popCount, bit, (.|.))
+  )
+import Data.List (minimumBy)
+import System.Environment (getArgs)
+import Criterion.Main
 
-type Grid = [[Int]]
-type Pos  = (Int, Int)
+-- Type aliases for readability
+type Grid = [Int]    -- 9x9 Sudoku grid stored as a flat list of 81 integers
+type Mask = Int      -- Bitmask representing possible digits
+type Pos = Int       -- Position in the grid (0..80)
 
-digits :: [Int]
-digits = [1..9]
+-- Bitmask representing all digits 1..9
+digitsMask :: Mask
+digitsMask = foldl setBit 0 [0..8]
 
--- Parse 9 lines of input with '-' for blanks
+-------------------------
+-- Helper functions
+-------------------------
+
+-- Row index (0..8) for a given position
+{-# NOINLINE row #-}
+row :: Pos -> Int
+row p = p `div` 9
+
+-- Column index (0..8) for a given position
+{-# NOINLINE col #-}
+col :: Pos -> Int
+col p = p `mod` 9
+
+-- Block index (0..8) for a given position
+{-# NOINLINE block #-}
+block :: Pos -> Int
+block p = (row p `div` 3) * 3 + col p `div` 3
+
+-------------------------
+-- Parsing
+-------------------------
+
+-- Parse a list of 9 strings (rows) into a Grid
+-- Empty cells: '-' or '0', digits '1'..'9' as themselves
 parseGrid :: [String] -> Maybe Grid
 parseGrid ls
-  | length ls /= 9 = Nothing
-  | otherwise = traverse parseLine validLines
+    | length ls /= 9 = Nothing
+    | otherwise = traverse parseChar (concat ls)
   where
-    validLines = filter (not . null) $ map (filter (`elem` "0123456789-")) ls
-    parseLine s
-      | length s /= 9 = Nothing
-      | otherwise = Just $ map charToCell s
-    charToCell c
-      | c == '-'  = 0
-      | c == '0'  = 0
-      | c >= '1' && c <= '9' = read [c]
-      | otherwise = 0
--- Print the grid
-showGrid :: Grid -> String
-showGrid g = intercalate "\n" $ map showRow g
+    parseChar '-' = Just 0
+    parseChar '0' = Just 0
+    parseChar c
+        | c >= '1' && c <= '9' = Just (fromEnum c - fromEnum '0')
+        | otherwise = Nothing
+
+-------------------------
+-- Initialize row/col/block masks
+-------------------------
+
+-- r, c, b are lists of bitmasks for rows, columns, and blocks
+initMasks :: Grid -> Maybe ([Mask], [Mask], [Mask])
+initMasks g = go 0 (replicate 9 0) (replicate 9 0) (replicate 9 0)
   where
-    showRow r = concatMap showCell r
-    showCell 0 = "0 "
-    showCell n = show n ++ " "
+    go 81 r c b = Just (r, c, b)  -- Finished processing all positions
+    go i r c b =
+        let v = g !! i
+        in if v == 0
+           then go (i+1) r c b  -- Empty cell, skip
+           else
+               let bitv = bit (v-1)
+                   ri = row i
+                   ci = col i
+                   bi = block i
+               -- Check for duplicates
+               in if testBit (r !! ri) (v-1) || testBit (c !! ci) (v-1) || testBit (b !! bi) (v-1)
+                  then Nothing  -- Invalid grid: duplicate detected
+                  else
+                      -- Update masks
+                      go (i+1)
+                         (update r ri (r !! ri .|. bitv))
+                         (update c ci (c !! ci .|. bitv))
+                         (update b bi (b !! bi .|. bitv))
 
-  
--- Return the value at a given position
-valueAt :: Grid -> Pos -> Int
-valueAt g (r,c) = g !! r !! c
+-- Helper to update a list at index i with value v
+update :: [a] -> Int -> a -> [a]
+update xs i v = take i xs ++ [v] ++ drop (i+1) xs
 
--- Update the grid by one cell (This creates a new grid every time it is called)
-updateGrid :: Grid -> Pos -> Int -> Grid
-updateGrid g (r,c) val =
-  take r g ++
-  [take c (g !! r) ++ [val] ++ drop (c+1) (g !! r)] ++
-  drop (r+1) g
+-------------------------
+-- Candidate computation
+-------------------------
 
--- Give all non-zero values in the specified row
-rowVals :: Grid -> Int -> [Int]
-rowVals g r = filter (/= 0) (g !! r)
+-- Compute bitmask of possible digits for a position
+candidates :: Grid -> [Mask] -> [Mask] -> [Mask] -> Pos -> Mask
+candidates g r c b p
+    | g !! p /= 0 = 0  -- Already filled
+    | otherwise = digitsMask .&. complement ((r !! row p) .|. (c !! col p) .|. (b !! block p))
 
--- Give all non-zero values in the specified column
-colVals :: Grid -> Int -> [Int]
-colVals g c = filter (/= 0) $ map (!! c) g
+-------------------------
+-- MRV (Minimum Remaining Values) selection
+-------------------------
 
--- Give all non-zero values in the specified 3x3 block
-blockVals :: Grid -> Pos -> [Int]
-blockVals g (r,c) = filter (/= 0)
-  [ g !! r' !! c'
-  | r' <- [br .. (br + 2)]
-  , c' <- [bc .. (bc + 2)]
-  ]
-  where
-    br = (r `div` 3) * 3
-    bc = (c `div` 3) * 3
+-- Select the empty cell with the fewest candidates
+selectPos :: Grid -> [Mask] -> [Mask] -> [Mask] -> Maybe (Pos, Mask)
+selectPos g r c b =
+    let opts = [ (p, m) | p <- [0..80], g !! p == 0, let m = candidates g r c b p, m /= 0 ]
+    in if null opts
+       then Nothing
+       else Just $ minimumBy (comparing (popCount . snd)) opts  -- Least options first
 
--- If the cell is filled, do not return any candidates
--- Otherwise, return digits not used in the same row, column, or block
-candidates :: Grid -> Pos -> [Int]
-candidates g (r,c)
-  | valueAt g (r,c) /= 0 = []
-  | otherwise = digits \\ used
-  where
-    used = rowVals g r ++ colVals g c ++ blockVals g (r,c)
+-------------------------
+-- Solver
+-------------------------
 
--- Find all empty cells in the grid
-emptyPositions :: Grid -> [Pos]
-emptyPositions g = [ (r,c) | r <- [0..8], c <- [0..8], valueAt g (r,c) == 0 ]
-
---For each empty position, compute its candidates.
---Then choose the one with the smallest number of options
---This is an MRV heuristic algorithm.
-selectPos :: Grid -> Maybe (Pos, [Int])
-selectPos g =
-  case candidatesNonEmpty of
-    [] -> Nothing
-    xs -> Just $ minimumBy (comparing (length . snd)) xs
-  where
-    positions = emptyPositions g
-    candidatesNonEmpty = [ (p, candidates g p) | p <- positions, not (null (candidates g p)) ]
-    
--- If there are no empty positions left, return the grid as a solution
--- otherwise, continue
-solve :: Grid -> [Grid]
-solve g
-  | null (emptyPositions g) = [g]  -- solved
-  | otherwise =
-      case selectPos g of
-        Nothing -> []  -- dead end
-        Just (pos, cs) -> concatMap tryVal cs
+solve :: Grid -> [Mask] -> [Mask] -> [Mask] -> Maybe Grid
+solve g r c b =
+    case selectPos g r c b of
+        Nothing ->
+            if all (/=0) g then Just g else Nothing  -- Grid complete
+        Just (p, m) -> tryVals (bits m)
           where
-            tryVal v = solve (updateGrid g pos v)
+            tryVals [] = Nothing
+            tryVals (v:vs) =
+                let bitv = bit (v-1)
+                    ri = row p
+                    ci = col p
+                    bi = block p
+                    -- Update grid and masks
+                    g' = update g p v
+                    r' = update r ri (r !! ri .|. bitv)
+                    c' = update c ci (c !! ci .|. bitv)
+                    b' = update b bi (b !! bi .|. bitv)
+                in case solve g' r' c' b' of
+                    Just sol -> Just sol
+                    Nothing  -> tryVals vs
 
--- Return the grid if it is solved, otherwise continue
-solveOnce :: Grid -> Maybe Grid
-solveOnce g = listToMaybe (solve g)
+-- Convert bitmask to list of digits
+bits :: Mask -> [Int]
+bits m = [i+1 | i <- [0..8], testBit m i]
 
--- Main: read a file instead of stdin
+-------------------------
+-- Pretty printing
+-------------------------
+
+showGrid :: Grid -> String
+showGrid g =
+    unlines [ unwords [ show (g !! (r*9 + c)) | c <- [0..8] ] | r <- [0..8] ]
+
+-------------------------
+-- Main
+-------------------------
 main :: IO ()
 main = do
-  args <- getArgs
-  case args of
-    [filePath] -> do
-      content <- readFile filePath
-      let ls = lines content
-      --putStrLn $ "Read " ++ show (length ls) ++ " lines"
-      --mapM_ print ls
-      case parseGrid (take 9 ls) of
-        Nothing -> putStrLn "Invalid input (need exactly 9 lines of 9 chars)."
-        Just grid -> case solveOnce grid of
-          Nothing -> putStrLn "No solution found."
-          Just sol -> putStrLn $ "Solved Sudoku:\n" ++ showGrid sol
-    _ -> putStrLn "Usage: ./solver <board_file>"
+  let puzzle =
+        [ "53--7----"
+        , "6--195---"
+        , "-98----6-"
+        , "8---6---3"
+        , "4--8-3--1"
+        , "7---2---6"
+        , "-6----28-"
+        , "---419--5"
+        , "----8--79"
+        ]
+  Criterion.Main.defaultMain
+    [ Criterion.Main.bench "solve puzzle" $
+        Criterion.Main.whnf (\ls ->
+            case parseGrid ls >>= \g ->
+                 initMasks g >>= \(r,c,b) -> solve g r c b of
+              Nothing -> 0
+              Just _  -> 1
+        ) puzzle
+    ]
+
+{--main :: IO ()
+main = do
+    args <- getArgs
+    case args of
+        [fp] -> do
+            ls <- lines <$> readFile fp
+            case parseGrid (take 9 ls) >>= \g -> initMasks g >>= \(r,c,b) -> solve g r c b of
+                Nothing  -> putStrLn "No solution"
+                Just sol -> putStrLn ("Solved Sudoku:\n" ++ showGrid sol)
+        _ -> putStrLn "Usage: ./solver <board_file>" --}
