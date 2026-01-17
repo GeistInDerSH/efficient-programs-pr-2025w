@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 #include <string>
-#include "common/board.hpp"
+#include "../common/board.hpp"
 
 /*
  * Lê um tabuleiro de um ficheiro.
