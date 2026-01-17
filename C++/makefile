@@ -1,31 +1,67 @@
-# c++ Compiler
+# ----------------------------
+# Compiler
+# ----------------------------
 CXX := g++
-CXXFLAGS = -std=c++17 -O2 -Wall -Wextra -pedantic
+CXXFLAGS := -std=c++17 -O2 -Wall -Wextra -pedantic
 
-# Source Files
-SOURCES  = unoptimized/sudoku_unoptimize.cpp
-HEADERS  = unoptimized/sudoku_unoptimize.hpp
+# ----------------------------
+# Folders
+# ----------------------------
+UNOPT_DIR := unoptimized
+BITMASK_DIR := bitmaskingrmv
 
-# Common objects
-OBJECTS  = $(SOURCES:.cpp=.o)
+# ----------------------------
+# Sources
+# ----------------------------
+UNOPT_SRC := $(UNOPT_DIR)/sudoku_unoptimize.cpp
+UNOPT_HDR := $(UNOPT_DIR)/sudoku_unoptimize.hpp
 
-# Primary targets
-all: sudoku benchmark
+BITMASK_SRC := $(BITMASK_DIR)/sudoku_bitmaskingrmv.cpp
+BITMASK_HDR := $(BITMASK_DIR)/sudoku_bitmaskingrmv.hpp
 
-# Main program that solves a sudoku puzzle
-sudoku: main.o $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -o sudoku.exe main.o $(OBJECTS)
+# ----------------------------
+# Objects
+# ----------------------------
+UNOPT_OBJ := $(UNOPT_SRC:.cpp=.o)
+BITMASK_OBJ := $(BITMASK_SRC:.cpp=.o)
 
-# Benchmark program
-benchmark: benchmark.o $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -o benchmark.exe benchmark.o $(OBJECTS)
+# ----------------------------
+# Targets
+# ----------------------------
+all: unoptimized bitmaskingrmv
 
-# General rules for .o
-%.o: %.cpp $(HEADERS)
+# ----------------------------
+# Sudoku executables
+# ----------------------------
+unoptimized: main.o $(UNOPT_OBJ)
+	$(CXX) $(CXXFLAGS) -o sudoku_unoptimized.exe main.o $(UNOPT_OBJ)
+
+bitmaskingrmv: main.o $(BITMASK_OBJ)
+	$(CXX) $(CXXFLAGS) -o sudoku_bitmaskingrmv.exe main.o $(BITMASK_OBJ)
+
+# ----------------------------
+# Benchmark executables
+# ----------------------------
+benchmark_unoptimized: benchmark.o $(UNOPT_OBJ)
+	$(CXX) $(CXXFLAGS) -o benchmark_unoptimized.exe benchmark.o $(UNOPT_OBJ)
+
+benchmark_bitmaskingrmv: benchmark.o $(BITMASK_OBJ)
+	$(CXX) $(CXXFLAGS) -o benchmark_bitmaskingrmv.exe benchmark.o $(BITMASK_OBJ)
+
+# ----------------------------
+# Object rules
+# ----------------------------
+%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Delete generated files
+# ----------------------------
+# Cleanup
+# ----------------------------
 clean:
-	rm -f *.o *.exe
+	rm -f \
+		$(UNOPT_DIR)/*.o \
+		$(BITMASK_DIR)/*.o \
+		*.o \
+		*.exe
 
-.PHONY: all clean sudoku benchmark
+.PHONY: all clean unoptimized bitmaskingrmv benchmark_unoptimized benchmark_bitmaskingrmv
