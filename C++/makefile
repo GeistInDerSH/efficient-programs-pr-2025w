@@ -16,8 +16,8 @@ BITMASK_DIR := bitmaskingrmv
 UNOPT_SRC := $(UNOPT_DIR)/sudoku_unoptimize.cpp
 UNOPT_HDR := $(UNOPT_DIR)/sudoku_unoptimize.hpp
 
-BITMASK_SRC := $(BITMASK_DIR)/sudoku_bitmaskingrmv.cpp
-BITMASK_HDR := $(BITMASK_DIR)/sudoku_bitmaskingrmv.hpp
+BITMASK_SRC := $(BITMASK_DIR)/sudoku_bitmasking_rmv.cpp
+BITMASK_HDR := $(BITMASK_DIR)/sudoku_bitmasking_rmv.hpp
 
 # ----------------------------
 # Objects
