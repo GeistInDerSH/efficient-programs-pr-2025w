@@ -1,4 +1,5 @@
 #include "sudoku_bitmasking_rmv.hpp"
+#include "common/board.hpp"
 
 #include <fstream>
 #include <iostream>

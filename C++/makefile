@@ -51,7 +51,7 @@ benchmark_bitmaskingrmv: benchmark.o $(BITMASK_OBJ)
 # ----------------------------
 # Object rules
 # ----------------------------
-%.o: %.cpp
+%.o: %.cpp common/board.hpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # ----------------------------
