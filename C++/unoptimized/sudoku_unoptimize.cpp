@@ -1,4 +1,6 @@
 #include "sudoku_unoptimize.hpp"
+#include "common/board.hpp"
+
 #include <fstream>
 #include <iostream>
 

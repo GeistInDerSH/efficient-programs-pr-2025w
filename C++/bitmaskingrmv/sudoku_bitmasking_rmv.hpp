@@ -3,11 +3,7 @@
 #include <array>
 #include <cstdint>
 #include <string>
-
-// Estrutura equivalente à struct Board em C
-struct Board {
-    std::array<std::uint8_t, 81> cells{}; // inicializado a 0
-};
+#include "common/board.hpp"
 
 /*
  * Lê um tabuleiro de um ficheiro.
