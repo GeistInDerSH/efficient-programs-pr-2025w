@@ -1,0 +1,124 @@
+===== fully-solved.sudoku =====
+Solver benchmark
+Solver: bitmaskingrmv
+Board: ../boards/fully-solved.sudoku
+Iterations: 1000
+
+Average time per iteration:
+  851 ns
+  0.851 µs
+  0.000851 ms
+
+===== invalid-col-collision.sudoku =====
+Solver benchmark
+Solver: bitmaskingrmv
+Board: ../boards/invalid-col-collision.sudoku
+Iterations: 1000
+
+Average time per iteration:
+  117 ns
+  0.117 µs
+  0.000117 ms
+
+===== solvable-2x-hard.sudoku =====
+Solver benchmark
+Solver: bitmaskingrmv
+Board: ../boards/solvable-2x-hard.sudoku
+Iterations: 1000
+
+Average time per iteration:
+  3874 ns
+  3.874 µs
+  0.003874 ms
+
+===== solvable-extra-hard-1.sudoku =====
+Solver benchmark
+Solver: bitmaskingrmv
+Board: ../boards/solvable-extra-hard-1.sudoku
+Iterations: 1000
+
+Average time per iteration:
+  2608 ns
+  2.608 µs
+  0.002608 ms
+
+===== invalid-box-collision.sudoku =====
+Solver benchmark
+Solver: bitmaskingrmv
+Board: ../boards/invalid-box-collision.sudoku
+Iterations: 1000
+
+Average time per iteration:
+  876 ns
+  0.876 µs
+  0.000876 ms
+
+===== invalid-row-col-collision.sudoku =====
+Solver benchmark
+Solver: bitmaskingrmv
+Board: ../boards/invalid-row-col-collision.sudoku
+Iterations: 1000
+
+Average time per iteration:
+  576 ns
+  0.576 µs
+  0.000576 ms
+
+===== solvable-easy-1.sudoku =====
+Solver benchmark
+Solver: bitmaskingrmv
+Board: ../boards/solvable-easy-1.sudoku
+Iterations: 1000
+
+Average time per iteration:
+  3436 ns
+  3.436 µs
+  0.003436 ms
+
+===== solvable-hard-1.sudoku =====
+Solver benchmark
+Solver: bitmaskingrmv
+Board: ../boards/solvable-hard-1.sudoku
+Iterations: 1000
+
+Average time per iteration:
+  13319 ns
+  13.319 µs
+  0.013319 ms
+
+===== invalid-characters.sudoku =====
+Error reading file: ../boards/invalid-characters.sudoku
+
+===== invalid-row-collision.sudoku =====
+Solver benchmark
+Solver: bitmaskingrmv
+Board: ../boards/invalid-row-collision.sudoku
+Iterations: 1000
+
+Average time per iteration:
+  6733 ns
+  6.733 µs
+  0.006733 ms
+
+===== solvable-example-1.sudoku =====
+Solver benchmark
+Solver: bitmaskingrmv
+Board: ../boards/solvable-example-1.sudoku
+Iterations: 1000
+
+Average time per iteration:
+  3359 ns
+  3.359 µs
+  0.003359 ms
+
+===== solvable-medium-1.sudoku =====
+Solver benchmark
+Solver: bitmaskingrmv
+Board: ../boards/solvable-medium-1.sudoku
+Iterations: 1000
+
+Average time per iteration:
+  3858 ns
+  3.858 µs
+  0.003858 ms
+
