@@ -50,7 +50,7 @@ overflow-checks = false
 
 [profile.release]
 codegen-units = 1
-debug = true
+debug = false
 debug-assertions = false
 incremental = false
 lto = "fat"
