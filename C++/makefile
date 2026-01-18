@@ -10,6 +10,7 @@ CXXFLAGS := -std=c++17 -O2 -Wall -Wextra -pedantic
 UNOPT_DIR := unoptimized
 BITMASK_DIR := bitmaskingrmv
 BITMASK_FC_DIR := bitmaskingrmvfc
+DLX_DIR := dlx
 
 # ----------------------------
 # Sources
@@ -23,17 +24,21 @@ BITMASK_HDR := $(BITMASK_DIR)/sudoku_bitmasking_rmv.hpp
 BITMASK_FC_SRC := $(BITMASK_FC_DIR)/sudoku_bitmasking_rmv_fc.cpp
 BITMASK_FC_HDR := $(BITMASK_FC_DIR)/sudoku_bitmasking_rmv_fc.hpp
 
+DLX_SRC := $(DLX_DIR)/sudoku_dlx.cpp
+DLX_HDR := $(DLX_DIR)/sudoku_dlx.hpp
+
 # ----------------------------
 # Objects
 # ----------------------------
 UNOPT_OBJ := $(UNOPT_SRC:.cpp=.o)
 BITMASK_OBJ := $(BITMASK_SRC:.cpp=.o)
 BITMASK_FC_OBJ := $(BITMASK_FC_SRC:.cpp=.o)
+DLX_OBJ := $(DLX_SRC:.cpp=.o)
 
 # ----------------------------
 # Targets
 # ----------------------------
-all: unoptimized bitmaskingrmv bitmaskingrmv_fc
+all: unoptimized bitmaskingrmv bitmaskingrmv_fc dlx
 
 # ----------------------------
 # Sudoku executables
@@ -47,6 +52,9 @@ bitmaskingrmv: main.o $(BITMASK_OBJ)
 bitmaskingrmv_fc: main.o $(BITMASK_FC_OBJ)
 	$(CXX) $(CXXFLAGS) -o sudoku_bitmaskingrmv_fc.exe main.o $(BITMASK_FC_OBJ)
 
+dlx: main.o $(DLX_OBJ)
+	$(CXX) $(CXXFLAGS) -o sudoku_dlx.exe main.o $(DLX_OBJ)
+
 # ----------------------------
 # Benchmark executables
 # ----------------------------
@@ -58,6 +66,9 @@ benchmark_bitmaskingrmv: benchmark.o $(BITMASK_OBJ)
 
 benchmark_bitmaskingrmv_fc: benchmark.o $(BITMASK_FC_OBJ)
 	$(CXX) $(CXXFLAGS) -o benchmark_bitmaskingrmv_fc.exe benchmark.o $(BITMASK_FC_OBJ)
+
+benchmark_dlx: benchmark.o $(DLX_OBJ)
+	$(CXX) $(CXXFLAGS) -o benchmark_dlx.exe benchmark.o $(DLX_OBJ)
 
 # ----------------------------
 # Object rules
@@ -73,9 +84,11 @@ clean:
 		$(UNOPT_DIR)/*.o \
 		$(BITMASK_DIR)/*.o \
 		$(BITMASK_FC_DIR)/*.o \
+		$(DLX_DIR)/*.o \
 		*.o \
 		*.exe \
 		bench_*
 
-.PHONY: all clean unoptimized bitmaskingrmv bitmaskingrmv_fc \
-        benchmark_unoptimized benchmark_bitmaskingrmv benchmark_bitmaskingrmv_fc
+.PHONY: all clean unoptimized bitmaskingrmv bitmaskingrmv_fc dlx \
+	benchmark_unoptimized benchmark_bitmaskingrmv \
+	benchmark_bitmaskingrmv_fc benchmark_dlx

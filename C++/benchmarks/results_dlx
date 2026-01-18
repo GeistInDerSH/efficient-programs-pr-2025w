@@ -1,0 +1,66 @@
+Benchmark report
+-----------------------------
+Solver     : DLX (Algorithm X)
+Board file : ../boards/fully-solved.sudoku
+Iterations : 50
+
+Total time : 1220 us
+Avg / run  : 24.4 us
+Avg / run  : 0.0244 ms
+
+Solution valid: YES
+Benchmark report
+-----------------------------
+Solver     : DLX (Algorithm X)
+Board file : ../boards/solvable-easy-1.sudoku
+Iterations : 50
+
+Total time : 1484 us
+Avg / run  : 29.68 us
+Avg / run  : 0.02968 ms
+
+Solution valid: YES
+Benchmark report
+-----------------------------
+Solver     : DLX (Algorithm X)
+Board file : ../boards/solvable-medium-1.sudoku
+Iterations : 50
+
+Total time : 1438 us
+Avg / run  : 28.76 us
+Avg / run  : 0.02876 ms
+
+Solution valid: YES
+Benchmark report
+-----------------------------
+Solver     : DLX (Algorithm X)
+Board file : ../boards/solvable-hard-1.sudoku
+Iterations : 50
+
+Total time : 1496 us
+Avg / run  : 29.92 us
+Avg / run  : 0.02992 ms
+
+Solution valid: YES
+Benchmark report
+-----------------------------
+Solver     : DLX (Algorithm X)
+Board file : ../boards/solvable-extra-hard-1.sudoku
+Iterations : 50
+
+Total time : 1462 us
+Avg / run  : 29.24 us
+Avg / run  : 0.02924 ms
+
+Solution valid: YES
+Benchmark report
+-----------------------------
+Solver     : DLX (Algorithm X)
+Board file : ../boards/solvable-2x-hard.sudoku
+Iterations : 50
+
+Total time : 2105 us
+Avg / run  : 42.1 us
+Avg / run  : 0.0421 ms
+
+Solution valid: YES

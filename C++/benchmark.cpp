@@ -5,6 +5,7 @@
 #include "unoptimized/sudoku_unoptimize.hpp"
 #include "bitmaskingrmv/sudoku_bitmasking_rmv.hpp"
 #include "bitmaskingrmvfc/sudoku_bitmasking_rmv_fc.hpp"
+#include "dlx/sudoku_dlx.hpp"
 
 // --------------------------------------------------
 // Validação de solução Sudoku
@@ -43,7 +44,8 @@ static bool validate_solution(const Board& original, const Board& solved) {
 enum class SolverType {
     UNOPTIMIZED,
     BITMASKING,
-    BITMASKING_FC
+    BITMASKING_FC,
+    DLX
 };
 
 const char* solver_name(SolverType t) {
@@ -51,6 +53,7 @@ const char* solver_name(SolverType t) {
         case SolverType::UNOPTIMIZED:    return "Unoptimized";
         case SolverType::BITMASKING:    return "Bitmasking+MRV";
         case SolverType::BITMASKING_FC: return "Bitmasking+MRV+FC";
+        case SolverType::DLX:           return "DLX (Algorithm X)";
     }
     return "Unknown";
 }
@@ -70,12 +73,16 @@ static bool solve_bitmasking_fc(const Board& in, Board& out) {
     return solve(in, out) == 1;
 }
 
+static bool solve_dlx(const Board& in, Board& out) {
+    return solve(in, out) == 1;
+}
+
 // --------------------------------------------------
 
 int main(int argc, char* argv[]) {
     if (argc < 3) {
         std::cout << "Usage:\n";
-        std::cout << "  ./benchmark.exe <unoptimized|bitmasking|bitmasking_fc> <board_file>\n";
+        std::cout << "  ./benchmark.exe <unoptimized|bitmasking|bitmasking_fc|dlx> <board_file>\n";
         return 1;
     }
 
@@ -90,6 +97,8 @@ int main(int argc, char* argv[]) {
         solver = SolverType::BITMASKING;
     else if (solver_arg == "bitmasking_fc")
         solver = SolverType::BITMASKING_FC;
+    else if (solver_arg == "dlx")
+        solver = SolverType::DLX;
     else {
         std::cout << "Unknown solver: " << solver_arg << "\n";
         return 1;
@@ -113,8 +122,10 @@ int main(int argc, char* argv[]) {
             solve_unoptimized(input, solution);
         else if (solver == SolverType::BITMASKING)
             solve_bitmasking(input, solution);
-        else
+        else if (solver == SolverType::BITMASKING_FC)
             solve_bitmasking_fc(input, solution);
+        else
+            solve_dlx(input, solution);
     }
 
     // --------------------------------------------------
@@ -127,8 +138,10 @@ int main(int argc, char* argv[]) {
             solve_unoptimized(input, solution);
         else if (solver == SolverType::BITMASKING)
             solve_bitmasking(input, solution);
-        else
+        else if (solver == SolverType::BITMASKING_FC)
             solve_bitmasking_fc(input, solution);
+        else
+            solve_dlx(input, solution);
     }
 
     auto end = std::chrono::steady_clock::now();
