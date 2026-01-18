@@ -244,7 +244,7 @@ In a nutshell, a normal Sudoku board is stored row-major: cells[row * 9 + col].
 This implies that checking a row is cache-friendly, since 9 subsequence bytes are read.
 The spacial locality in this case is perfect.
 This is the fastest way to access the memory. When the CPU brings the cell "i" in cache, it also 
-bringes the rest of the cache line (the next 63 bytes), so the next iterations are basically instant.
+brings the rest of the cache line (the next 63 bytes), so the next iterations are basically instant.
 
 
 But, checking a column is not cache-friendly. First cells[col] is read, then cells[col+9], then 
@@ -273,7 +273,7 @@ for (int v = 0; v < 9; v++) {
     if (col_data[v] == value) return 0; // also sequential now!
 }
 
-THis means:
+This means:
 - Row check: sequential (same as before)
 - Column check: now also sequential because the column is stored as a contiguous 9-byte block in cells_col_major
 
@@ -298,9 +298,10 @@ The drawback: the code becomes longer and uglier. The code vizibility is sacrifi
 
 This optimization is focusing on the grid setup in the beginning
 
-int box_start_row = (row / 3) * 3; int box_start_col = (col / 3) * 3;
+int box_start_row = (row / 3) * 3; 
+int box_start_col = (col / 3) * 3;
 
-The division (/) and multiplication (*) operations are on integers very slow than a simple memory(loopup) read
+The division (/) and multiplication (*) operations are on integers very slow than a simple memory(lookup) read
 
 We replace the slow CPU instructions (DIV, MUL) with faster instructions (MOV)
 
