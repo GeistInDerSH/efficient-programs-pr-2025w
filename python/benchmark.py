@@ -22,7 +22,6 @@ PROGS = [
     ["python3", "../python/solver_optimized/sudoku_optimized_v3.py"],
     ["python3", "../python/solver_optimized/sudoku_optimized_v4.py"],
     ["python3", "../python/solver_optimized/sudoku_optimized_v5.py"],
-    ["python3", "../python/solver_optimized/sudoku_optimized_v6.py"],
 ]
 def run_perf(prog, board):
     """
