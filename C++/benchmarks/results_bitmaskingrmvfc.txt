@@ -1,0 +1,66 @@
+Benchmark report
+-----------------------------
+Solver     : Bitmasking+MRV+FC
+Board file : ../boards/fully-solved.sudoku
+Iterations : 50
+
+Total time : 10 us
+Avg / run  : 0.2 us
+Avg / run  : 0.0002 ms
+
+Solution valid: YES
+Benchmark report
+-----------------------------
+Solver     : Bitmasking+MRV+FC
+Board file : ../boards/solvable-easy-1.sudoku
+Iterations : 50
+
+Total time : 125 us
+Avg / run  : 2.5 us
+Avg / run  : 0.0025 ms
+
+Solution valid: YES
+Benchmark report
+-----------------------------
+Solver     : Bitmasking+MRV+FC
+Board file : ../boards/solvable-medium-1.sudoku
+Iterations : 50
+
+Total time : 243 us
+Avg / run  : 4.86 us
+Avg / run  : 0.00486 ms
+
+Solution valid: YES
+Benchmark report
+-----------------------------
+Solver     : Bitmasking+MRV+FC
+Board file : ../boards/solvable-hard-1.sudoku
+Iterations : 50
+
+Total time : 210 us
+Avg / run  : 4.2 us
+Avg / run  : 0.0042 ms
+
+Solution valid: YES
+Benchmark report
+-----------------------------
+Solver     : Bitmasking+MRV+FC
+Board file : ../boards/solvable-extra-hard-1.sudoku
+Iterations : 50
+
+Total time : 308 us
+Avg / run  : 6.16 us
+Avg / run  : 0.00616 ms
+
+Solution valid: YES
+Benchmark report
+-----------------------------
+Solver     : Bitmasking+MRV+FC
+Board file : ../boards/solvable-2x-hard.sudoku
+Iterations : 50
+
+Total time : 332 us
+Avg / run  : 6.64 us
+Avg / run  : 0.00664 ms
+
+Solution valid: YES
