@@ -104,7 +104,10 @@ def solve_puzzle(board: List[List[int]], row_mask, col_mask, box_mask) -> bool:
     """
     best_pos, candidates_mask = find_mrv(board, row_mask, col_mask, box_mask)
     if best_pos is None:
-        return True
+        if candidates_mask is None:
+            return True
+        else:
+            return False
     row, col = best_pos
     bidx = (row // 3) * 3 + (col // 3)
 

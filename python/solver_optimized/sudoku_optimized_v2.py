@@ -73,7 +73,7 @@ def find_mrv(board, row_used, col_used, box_used):
                 candidates = allowedValues(row, col, row_used, col_used, box_used)
                 cand_len = len(candidates)
                 if cand_len == 0:
-                    return None, None
+                    return None, set()
                 # if candidate count is 1, best solution found
                 if cand_len == 1:
                     return (row, col), candidates
