@@ -1,6 +1,6 @@
 # Compiler and flags
 CC = gcc
-CFLAGS = -Wall -Wextra  # Warnings, Optimization, Debug symbols
+CFLAGS = -Wall -march=native  -O3 -Wextra  # Warnings, Optimization, Debug symbols
 
 # Executable names
 EXECUTABLE = sudoku_solver
