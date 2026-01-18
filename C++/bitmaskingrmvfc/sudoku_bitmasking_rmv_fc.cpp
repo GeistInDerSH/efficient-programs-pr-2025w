@@ -6,6 +6,7 @@
 
 #include <fstream>
 #include <string>
+#include <iostream>
 
 static constexpr uint16_t FULL_MASK = 0x1FF; // 9 bits
 
@@ -208,4 +209,13 @@ int read_file(Board& board, const std::string& filename) {
     }
 
     return cell_index == 81 ? 0 : 1;
+}
+
+void print_board(const Board& board) {
+    for (int r = 0; r < 9; r++) {
+        for (int c = 0; c < 9; c++) {
+            std::cout << int(board.cells[r * 9 + c]);
+        }
+        std::cout << "\n";
+    }
 }
