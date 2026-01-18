@@ -23,28 +23,34 @@ static inline int count_bits(uint16_t x) {
 
 // --------------------------------------------------
 // MRV: escolhe a célula vazia com menos opções
-static bool find_best_cell(const Board& board, int& best_r, int& best_c, uint16_t& best_mask) {
+
+static bool find_best_cell(const Board& board,
+                           int& best_r,
+                           int& best_c,
+                           uint16_t& best_mask,
+                           bool& has_empty) {
     int min_count = 10;
-    bool found = false;
+    has_empty = false;
 
     for (int r = 0; r < 9; r++) {
         for (int c = 0; c < 9; c++) {
             int idx = r * 9 + c;
             if (board.cells[idx] == 0) {
+                has_empty = true;
+
                 int b = box_index(r, c);
                 uint16_t used = row_mask[r] | col_mask[c] | box_mask[b];
                 uint16_t avail = (~used) & FULL_MASK;
                 int cnt = count_bits(avail);
 
                 if (cnt == 0)
-                    return false;
+                    return false; // contradição
 
                 if (cnt < min_count) {
                     min_count = cnt;
                     best_r = r;
                     best_c = c;
                     best_mask = avail;
-                    found = true;
 
                     if (cnt == 1)
                         return true;
@@ -52,7 +58,7 @@ static bool find_best_cell(const Board& board, int& best_r, int& best_c, uint16_
             }
         }
     }
-    return found;
+    return has_empty;
 }
 
 // --------------------------------------------------
@@ -60,10 +66,15 @@ static bool find_best_cell(const Board& board, int& best_r, int& best_c, uint16_
 static bool solve_recursive(Board& board) {
     int r, c;
     uint16_t avail_mask;
+    bool has_empty;
 
-    if (!find_best_cell(board, r, c, avail_mask)) {
+    bool ok = find_best_cell(board, r, c, avail_mask, has_empty);
+
+    if (!has_empty)
         return true; // resolvido
-    }
+
+    if (!ok)
+        return false; // contradição
 
     int b = box_index(r, c);
     int idx = r * 9 + c;

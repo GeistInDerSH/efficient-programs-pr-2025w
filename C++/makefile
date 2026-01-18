@@ -62,6 +62,7 @@ clean:
 		$(UNOPT_DIR)/*.o \
 		$(BITMASK_DIR)/*.o \
 		*.o \
-		*.exe
+		*.exe \
+		bench_*
 
 .PHONY: all clean unoptimized bitmaskingrmv benchmark_unoptimized benchmark_bitmaskingrmv
