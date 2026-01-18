@@ -181,7 +181,7 @@ const uint8_t* cells = board->cells;
 
 
 - the bottleneck of the algorithm is the function is_valid()
-- this funciton is called for each number from 1 to 9, number which the algorithm tries to place it in an empty cell
+- this function is called for each number from 1 to 9, number which the algorithm tries to place it in an empty cell
 - each time the function scans 9(row) + 9(column) + 9(box) = 27 cells
 - This is a waste of time, because the same scans are performed thousands of times  
 
@@ -232,13 +232,13 @@ How does it work ?
 The key optimization lies in avoiding repeated scanning of the row, column, and 3×3 box each time we place a number. Instead, we maintain three bitmask arrays—rows, cols, and boxes. In these arrays, each bit indicates whether a particular number has already been used in that row, column, or box.
 
 
-********************* Optimized version 3 (Cache optimizations) ********************* TODO
+********************* Optimized version 3 (Cache optimizations) *********************
 
 This technique is aimed to solve one particular problem with the cache usage for the other versions.
 
 Although, initially I thought that the changes will not have an impact, since the whole Sudoku board
 contains only 81 bytes and those bytes can fit in the L1 cache memory, hence no cache misses, the 
-measurements results preoved me otherwise.
+measurements results proved my assumption wrong.
 
 In a nutshell, a normal Sudoku board is stored row-major: cells[row * 9 + col].
 This implies that checking a row is cache-friendly, since 9 subsequence bytes are read.
