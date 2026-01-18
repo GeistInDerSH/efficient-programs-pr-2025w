@@ -1,102 +1,66 @@
-===== fully-solved.sudoku =====
-Solver benchmark unoptimized (C++)
-Board: ../../boards/fully-solved.sudoku
-Iterations: 1000
+Benchmark report
+-----------------------------
+Solver     : Unoptimized
+Board file : ../boards/fully-solved.sudoku
+Iterations : 50
 
-Average time per iteration: 255 ns
-Average time per iteration: 0.255 µs
-Average time per iteration: 0.000255 ms
+Total time : 2 us
+Avg / run  : 0.04 us
+Avg / run  : 4e-05 ms
 
-===== invalid-col-collision.sudoku =====
-Solver benchmark unoptimized (C++)
-Board: ../../boards/invalid-col-collision.sudoku
-Iterations: 1000
+Solution valid: YES
+Benchmark report
+-----------------------------
+Solver     : Unoptimized
+Board file : ../boards/solvable-easy-1.sudoku
+Iterations : 50
 
-Average time per iteration: 1851 ns
-Average time per iteration: 1.851 µs
-Average time per iteration: 0.001851 ms
+Total time : 76 us
+Avg / run  : 1.52 us
+Avg / run  : 0.00152 ms
 
-===== solvable-2x-hard.sudoku =====
-Solver benchmark unoptimized (C++)
-Board: ../../boards/solvable-2x-hard.sudoku
-Iterations: 1000
+Solution valid: YES
+Benchmark report
+-----------------------------
+Solver     : Unoptimized
+Board file : ../boards/solvable-medium-1.sudoku
+Iterations : 50
 
-Average time per iteration: 5256043 ns
-Average time per iteration: 5256.04 µs
-Average time per iteration: 5.25604 ms
+Total time : 561 us
+Avg / run  : 11.22 us
+Avg / run  : 0.01122 ms
 
-===== solvable-extra-hard-1.sudoku =====
-Solver benchmark unoptimized (C++)
-Board: ../../boards/solvable-extra-hard-1.sudoku
-Iterations: 1000
+Solution valid: YES
+Benchmark report
+-----------------------------
+Solver     : Unoptimized
+Board file : ../boards/solvable-hard-1.sudoku
+Iterations : 50
 
-Average time per iteration: 1251317 ns
-Average time per iteration: 1251.32 µs
-Average time per iteration: 1.25132 ms
+Total time : 17945 us
+Avg / run  : 358.9 us
+Avg / run  : 0.3589 ms
 
-===== invalid-box-collision.sudoku =====
-Solver benchmark unoptimized (C++)
-Board: ../../boards/invalid-box-collision.sudoku
-Iterations: 1000
+Solution valid: YES
+Benchmark report
+-----------------------------
+Solver     : Unoptimized
+Board file : ../boards/solvable-extra-hard-1.sudoku
+Iterations : 50
 
-Average time per iteration: 856 ns
-Average time per iteration: 0.856 µs
-Average time per iteration: 0.000856 ms
+Total time : 58754 us
+Avg / run  : 1175.08 us
+Avg / run  : 1.17508 ms
 
-===== invalid-row-col-collision.sudoku =====
-Solver benchmark unoptimized (C++)
-Board: ../../boards/invalid-row-col-collision.sudoku
-Iterations: 1000
+Solution valid: YES
+Benchmark report
+-----------------------------
+Solver     : Unoptimized
+Board file : ../boards/solvable-2x-hard.sudoku
+Iterations : 50
 
-Average time per iteration: 345 ns
-Average time per iteration: 0.345 µs
-Average time per iteration: 0.000345 ms
+Total time : 248531 us
+Avg / run  : 4970.62 us
+Avg / run  : 4.97062 ms
 
-===== solvable-easy-1.sudoku =====
-Solver benchmark unoptimized (C++)
-Board: ../../boards/solvable-easy-1.sudoku
-Iterations: 1000
-
-Average time per iteration: 1831 ns
-Average time per iteration: 1.831 µs
-Average time per iteration: 0.001831 ms
-
-===== solvable-hard-1.sudoku =====
-Solver benchmark unoptimized (C++)
-Board: ../../boards/solvable-hard-1.sudoku
-Iterations: 1000
-
-Average time per iteration: 392199 ns
-Average time per iteration: 392.199 µs
-Average time per iteration: 0.392199 ms
-
-===== invalid-characters.sudoku =====
-Error reading file: ../../boards/invalid-characters.sudoku
-
-===== invalid-row-collision.sudoku =====
-Solver benchmark unoptimized (C++)
-Board: ../../boards/invalid-row-collision.sudoku
-Iterations: 1000
-
-Average time per iteration: 1833 ns
-Average time per iteration: 1.833 µs
-Average time per iteration: 0.001833 ms
-
-===== solvable-example-1.sudoku =====
-Solver benchmark unoptimized (C++)
-Board: ../../boards/solvable-example-1.sudoku
-Iterations: 1000
-
-Average time per iteration: 2301613 ns
-Average time per iteration: 2301.61 µs
-Average time per iteration: 2.30161 ms
-
-===== solvable-medium-1.sudoku =====
-Solver benchmark unoptimized (C++)
-Board: ../../boards/solvable-medium-1.sudoku
-Iterations: 1000
-
-Average time per iteration: 12764 ns
-Average time per iteration: 12.764 µs
-Average time per iteration: 0.012764 ms
-
+Solution valid: YES
