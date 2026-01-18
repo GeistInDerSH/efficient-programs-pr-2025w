@@ -21,6 +21,7 @@ SOLVERS = [
     ("bitmasking", "benchmark_bitmaskingrmv.exe"),
     ("bitmasking_fc", "benchmark_bitmaskingrmv_fc.exe"),
     ("dlx", "benchmark_dlx.exe"),
+    ("hybrid","benchmark_hybrid.exe")
 ]
 
 # -----------------------------
