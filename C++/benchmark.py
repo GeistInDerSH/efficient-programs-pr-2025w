@@ -17,11 +17,11 @@ OUTCSV = "benchmark_results.csv"
 
 # Lista dos teus solvers
 SOLVERS = [
-    ("unoptimized", "benchmark_unoptimized.exe"),
-    ("bitmasking", "benchmark_bitmaskingrmv.exe"),
-    ("bitmasking_fc", "benchmark_bitmaskingrmv_fc.exe"),
-    ("dlx", "benchmark_dlx.exe"),
-    ("hybrid","benchmark_hybrid.exe")
+    ("unoptimized", "sudoku_unoptimized.exe"),
+    ("bitmasking", "sudoku_bitmaskingrmv.exe"),
+    ("bitmasking_fc", "sudoku_bitmaskingrmv_fc.exe"),
+    ("dlx", "sudoku_dlx.exe"),
+    ("hybrid", "sudoku_hybrid.exe"),
 ]
 
 # -----------------------------
@@ -30,9 +30,9 @@ def _digits_only(s: str) -> str:
     return re.sub(r"[^0-9]", "", s)
 
 
-def run_perf(solver_bin: Path, solver_name: str, board_path: Path):
+def run_perf(solver_bin: Path, board_path: Path):
     """
-    Runs one benchmark using perf stat.
+    Runs one solver using perf stat.
     Returns: (exit_code, wall_ns, cycles, instructions)
     """
     perf_cmd = [
@@ -42,7 +42,6 @@ def run_perf(solver_bin: Path, solver_name: str, board_path: Path):
         "-x", ",",
         "--",
         str(solver_bin),
-        solver_name,
         str(board_path),
     ]
 
@@ -121,7 +120,7 @@ def main():
                     print(f"Benchmark for {solver_name} | {board.name} | run {run}")
 
                     rc, wall_ns, cycles, instr = run_perf(
-                        solver_bin, solver_name, board
+                        solver_bin, board
                     )
 
                     if rc != 0:
